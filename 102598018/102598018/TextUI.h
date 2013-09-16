@@ -1,7 +1,7 @@
 #ifndef TEXTUI
 #define TEXTUI
 
-#include <QDebug>
+// #include <QDebug>
 #include <iostream>
 #include <string>
 #include "ERModel.h"
@@ -14,7 +14,9 @@ public:
 	TextUI(ERModel*);
 	~TextUI();
 	void displayMenu();
-	void processCommand(ERModel&);
+	void processCommand();
+private:
+	ERModel* erModel;
 };
 
 #endif

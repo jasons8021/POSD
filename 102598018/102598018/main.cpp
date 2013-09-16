@@ -8,8 +8,8 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 	QCoreApplication a(argc, argv);
-	ERModel* erModel;
-	TextUI textUI(erModel);
+	TextUI* textUI;
+	textUI = new TextUI(new ERModel());
 
 	return a.exec();
 }

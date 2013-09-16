@@ -4,11 +4,8 @@ NodeEntity::NodeEntity()
 {
 }
 
-NodeEntity::NodeEntity( int id, string text )
+NodeEntity::NodeEntity( int id, string text ) : Node( id, text )
 {
-	setID(id);
-	setType("E");
-	setText(text);
 }
 
 NodeEntity::~NodeEntity()

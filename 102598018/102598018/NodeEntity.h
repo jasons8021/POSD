@@ -11,7 +11,7 @@ class NodeEntity : public Node
 {
 public:
 	NodeEntity();
-	NodeEntity(int,string);
+	NodeEntity(int, string);
 	~NodeEntity();
 	void connectTo(Component*);
 	bool canConnectTo(Component*);

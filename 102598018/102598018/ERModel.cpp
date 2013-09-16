@@ -18,10 +18,13 @@ void ERModel::addNode( string type, string text )
 	Component* newComponent;
 	ComponentFactory componentFactory;
 
-	//componentID = components.size();
-	cout << components.size() << "\n";
-	//newComponent = componentFactory.creatComponent(++componentID, type, text);
-  	//components.push_back(*newComponent);
+	componentID = 0;
+	
+	newComponent = componentFactory.creatComponent(++componentID, type, text);
+  	components.push_back(newComponent);
+	cout << newComponent->getID() << "\n";
+	cout << newComponent->getType() << "\n";
+	cout << newComponent->getText() << "\n";
 }
 
 void ERModel::addConnection( Component firstNode, Component secondNode )

@@ -5,11 +5,8 @@ NodeAttribute::NodeAttribute()
 
 }
 
-NodeAttribute::NodeAttribute( int id, string text )
+NodeAttribute::NodeAttribute( int id, string text ) : Node()
 {
-	setID(id);
-	setType("A");
-	setText(text);
 }
 
 NodeAttribute::~NodeAttribute()

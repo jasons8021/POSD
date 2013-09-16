@@ -7,6 +7,13 @@ Component::Component()
 // 	this->text = text;
 }
 
+Component::Component(int id, string text)
+{
+	this->id = id;
+	this->type = type;
+	this->text = text;
+}
+
 Component::~Component()
 {
 
@@ -25,21 +32,6 @@ string Component::getType()
 string Component::getText()
 {
 	return this->text;
-}
-
-void Component::setID( int id )
-{
-	this->id = id;
-}
-
-void Component::setType( string type )
-{
-	this->type = type;
-}
-
-void Component::setText( string text )
-{
-	this->text = text;
 }
 
 void Component::connectTo( Component* )

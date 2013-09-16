@@ -10,6 +10,7 @@ using namespace std;
 class Node : public Component{
 public:
 	Node();
+	Node(int, string);
 	~Node();
 	void connectTo(Component*);
 	bool canConnectTo(Component*);

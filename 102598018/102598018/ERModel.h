@@ -17,7 +17,7 @@ public:
 	void getTable();
 private:
 	int componentID;
-	vector<Component> components;
+	vector<Component*> components;
 };
 
 #endif
