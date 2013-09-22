@@ -2,10 +2,9 @@
 
 NodeRelationship::NodeRelationship()
 {
-
 }
 
-NodeRelationship::NodeRelationship( int id, string text ) : Node( id ,text )
+NodeRelationship::NodeRelationship( int id, string text ) : Node( id, PARAMETER_RELATIONSHOP, text )
 {
 }
 
@@ -15,10 +14,15 @@ NodeRelationship::~NodeRelationship()
 
 void NodeRelationship::connectTo( Component* targetNode )
 {
-
+// 	// TargetNode isn't in connections
+// 	if( !(searchConnections(targetNode->getID())) )
+// 		pushConnection(targetNode);								// Push connected Node into connections
 }
 
 bool NodeRelationship::canConnectTo( Component* targetNode )
 {
-	return true;
+	if (targetNode->getType() == PARAMETER_ENTITY)
+		return true;
+	else
+		return false;
 }

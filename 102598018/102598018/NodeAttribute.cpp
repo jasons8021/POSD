@@ -2,10 +2,9 @@
 
 NodeAttribute::NodeAttribute()
 {
-
 }
 
-NodeAttribute::NodeAttribute( int id, string text ) : Node()
+NodeAttribute::NodeAttribute( int id, string text ) : Node( id, PARAMETER_ATTRIBUTE, text)
 {
 }
 
@@ -20,5 +19,8 @@ void NodeAttribute::connectTo( Component* targetNode )
 
 bool NodeAttribute::canConnectTo( Component* targetNode )
 {
-	return true;
+	if (targetNode->getType() == PARAMETER_ENTITY)
+		return true;
+	else
+		return false;
 }
