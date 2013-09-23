@@ -4,7 +4,8 @@
 TextUI::TextUI(ERModel* erModel)
 {
 	this->erModel = erModel;
-
+	isDisplayComponentsTable = true;
+	isDisplayConnectionsTable = true;
 	displayMenu();
 }
 
@@ -15,6 +16,8 @@ TextUI::~TextUI()
 void TextUI::displayMenu()
 {
 	cout << TEXT_MENU;
+	isDisplayComponentsTable = true;
+	isDisplayConnectionsTable = true;
 	processCommand();
 }
 
@@ -87,7 +90,10 @@ void TextUI::addConnection()
 
 	// if connection is failed, erModel->addConnection() return an error message.
 	if(erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_FINISH)
+	{
 		cout << erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) << endl;
+		isDisplayConnectionsTable = false;
+	}
 	else if(erModel->checkSetCardinality(firstComponentID, secondComponentID))
 	{
 		cout << TEXT_CONNECTION_CARDINALITY << endl;
@@ -112,12 +118,12 @@ void TextUI::addConnection()
 
 void TextUI::displayComponentTable()
 {
-	if (erModel->getComponentsTable(PARAMETER_ALL) != "")
+	if (isDisplayComponentsTable)
 	{
 		// ComponentTable format
 		cout << TEXT_ADDNEWNODE_TITLE << endl;
 		cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
-		cout << TEXT_ADDNEWNODE_TABLEFORMAT << endl;
+		cout << TEXT_COMPONENT_TABLEFORMAT << endl;
 		cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
 
 		// ComponentTable contents string
@@ -130,7 +136,7 @@ void TextUI::displayComponentTable()
 
 void TextUI::displayConnectionTable()
 {
-	if (erModel->getConnectionTable() != "")
+	if (isDisplayConnectionsTable)
 	{
 		// ConnectiontTable format
 		cout << TEXT_CONNECTION_TITLE << endl;
@@ -147,7 +153,7 @@ void TextUI::displayConnectionTable()
 	
 }
 
-string TextUI::searchComponent(string searchType)
+string TextUI::searchComponent( string searchType )
 {
 	string searchID;
 
@@ -155,33 +161,55 @@ string TextUI::searchComponent(string searchType)
 	while(!(erModel->searchComponentExist(searchID, searchType))){
 		if (searchType == PARAMETER_ALL)
 			cout << TEXT_CONNECTION_ERRORNODE;
-		else if(searchType == PARAMETER_ENTITY)
-			cout << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
-		
 		cin >> searchID;
 	}
 	return searchID;
 }
 
+
 void TextUI::setPrimaryKey()
 {
-	int entityNodeID;
+	string entityNodeID;
+	string AttributeNodeID;
 
 	displayEntityTable();
-	entityNodeID = atoi(searchComponent(PARAMETER_ENTITY).c_str());
-	erModel->setPrimaryKeyEntity(entityNodeID);
 
+	cout << TEXT_SETPRIMARYKEY_ENTERNODEID;
+	entityNodeID = searchEntity(PARAMETER_ENTITY);
+
+	cout << TEXT_SETPRIMARYKEY_ATTRIBUTEOFENTITY << entityNodeID << TEXT_SETPRIMARYKEY_ENDTEXT;
+	displayAttributeTable(atoi(entityNodeID.c_str()));
+	cout << TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE;
+	cin >> AttributeNodeID;
+
+}
+
+string TextUI::searchEntity( string searchType )
+{
+	string searchID;
+
+	cin >> searchID;
+	while(true){
+		if (!erModel->searchComponentExist(searchID, PARAMETER_ALL))					// The component is not exist.
+			cout << TEXT_CONNECTION_ERRORNODE;
+		else if (erModel->searchComponentExist(searchID, PARAMETER_ENTITY))				// Entity is found.
+			break;
+		else																			// Component is exist, but its type isn't entity.
+			cout << TEXT_NODENUMBEGIN << searchID << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
+		cin >> searchID;
+	}
+	return searchID;
 }
 
 void TextUI::displayEntityTable()
 {
-	// ComponentTable format
-	cout << TEXT_ADDNEWNODE_TITLE << endl;
+	// EntityTable format
+	cout << TEXT_SETPRIMARYKEY_ENTITYTITLE << endl;
 	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
-	cout << TEXT_ADDNEWNODE_TABLEFORMAT << endl;
+	cout << TEXT_COMPONENT_TABLEFORMAT << endl;
 	cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
 
-	//EntityTable format
+	// EntityTable format
 	cout << erModel->getComponentsTable(PARAMETER_ENTITY);
 
 	// ComponentTable End
@@ -189,7 +217,17 @@ void TextUI::displayEntityTable()
 	
 }
 
-void TextUI::displayAttributeTable()
+void TextUI::displayAttributeTable( int entityID)
 {
-	
+	// AttributeTable format
+	cout << TEXT_SETPRIMARYKEY_ENTITYTITLE << endl;
+	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
+	cout << TEXT_COMPONENT_TABLEFORMAT << endl;
+	cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
+
+	//EntityTable format
+	cout << erModel->searchAttributeOfEntity(entityID);
+
+	// ComponentTable End
+	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
 }

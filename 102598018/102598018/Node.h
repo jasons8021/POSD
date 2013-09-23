@@ -1,6 +1,8 @@
 #ifndef NODE
 #define NODE
 
+#define PARAMETER_SPACE ""
+
 #include <vector>
 #include "Component.h"
 
@@ -12,7 +14,7 @@ public:
 	Node(int, string, string);
 	~Node();
 	virtual void connectTo(Component*);
-	virtual bool canConnectTo(Component*);
+	virtual string canConnectTo(Component*);
 };
 
 #endif

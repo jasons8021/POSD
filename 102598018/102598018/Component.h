@@ -1,8 +1,19 @@
 #ifndef COMPONENT
 #define COMPONENT
 
+#define TEXT_NODENUMBEGIN "The node '"
+#define TEXT_CONNECTION_NOTCONNECTION "' cannot be connected by the node '"
+#define TEXT_CONNECTION_ITSELFCONNECTION "' cannot be connected to itself."
+#define TEXT_CONNECTION_ALREADYCONNECTION "' has already been connected to component '"
+#define TEXT_ENDTEXT "'."
+#define TEXT_CONNECTION_FINISH "CONNECTOK"
+
+#define PARAMETER_SPACE ""
+
+#include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -13,12 +24,14 @@ public:
 	Component(int, string, string);
 	~Component();
 	int getID();
+	string getIDString();
 	string getType();
 	string getText();
 	bool searchConnections(int);
 	void pushConnection(Component*);
+	vector<Component*> getConnections();
 	virtual void connectTo(Component*);
-	virtual bool canConnectTo(Component*);
+	virtual string canConnectTo(Component*);
 private:
 	int id;
 	string type;

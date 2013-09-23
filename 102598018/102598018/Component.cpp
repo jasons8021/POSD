@@ -41,10 +41,19 @@ void Component::connectTo( Component* targetNode )
 	}
 }
 
-bool Component::canConnectTo( Component* TargetNode )
+string Component::canConnectTo( Component* targetNode )
 {
-	// The method is implemeneted by derived class.
-	return false;
+	if (this->getID() != targetNode->getID())
+	{
+		if (!(this->searchConnections(targetNode->getID())))
+		{
+			return TEXT_CONNECTION_FINISH;
+		}
+		else
+			return TEXT_NODENUMBEGIN + this->getIDString() + TEXT_CONNECTION_ALREADYCONNECTION + targetNode->getIDString() + TEXT_ENDTEXT;
+	}
+	else
+		return TEXT_NODENUMBEGIN + this->getIDString() + TEXT_CONNECTION_ITSELFCONNECTION;
 }
 
 bool Component::searchConnections( int searchID )
@@ -62,5 +71,22 @@ bool Component::searchConnections( int searchID )
 void Component::pushConnection( Component* connectedNode)
 {
 	connections.push_back(connectedNode);
+}
+
+std::string Component::getIDString()
+{
+	stringstream intNum;
+	string intToStringNum;
+
+	// int to string
+	intNum << this->getID(); // int to stringstream
+	intNum >> intToStringNum; // stringstream to string
+
+	return intToStringNum;
+}
+
+vector<Component*> Component::getConnections()
+{
+	return this->connections;
 }
 

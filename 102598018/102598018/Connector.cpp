@@ -16,13 +16,11 @@ Connector::~Connector()
 
 void Connector::connectTo( Component* )
 {
-	// Maybe implement in future homework.
 }
 
-bool Connector::canConnectTo( Component* )
+string Connector::canConnectTo( Component* )
 {
-	// Maybe implement in future homework.
-	return false;
+	return PARAMETER_SPACE;
 }
 
 void Connector::setSourceNode( Component* sourceNode )
@@ -44,7 +42,6 @@ Component* Connector::getDestinationNode()
 {
 	return this->destinationNode;
 }
-
 
 
 void Connector::setConnectedNode( Component* sourceNode, Component* destinationNode )

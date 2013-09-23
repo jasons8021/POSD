@@ -1,14 +1,6 @@
 #ifndef ERMODEL
 #define ERMODEL
 
-#define TEXT_ERROR_MESSAGEBEGIN "The node '"
-#define TEXT_CONNECTION_CONNECTFINISH "' has been connected to the node '"
-#define TEXT_CONNECTION_NOTCONNECTION "' cannot be connected by the node '"
-#define TEXT_CONNECTION_ITSELFCONNECTION "' cannot be connected to itself."
-#define TEXT_CONNECTION_ALREADYCONNECTION "' has already been connected to component '"
-#define TEXT_CONNECTION_TEXTEND "'."
-#define TEXT_CONNECTION_FINISH "CONNECTOK"
-
 #define TEXT_TWOSPACE "  "
 #define TEXT_FIVESPACE "     "
 #define TEXT_SPACELINE "   |"
@@ -20,6 +12,8 @@
 #define PARAMETER_RELATIONSHOP "R"
 #define PARAMETER_CONNECTOR "C"
 #define PARAMETER_ALL "ALLTYPE"
+
+#define SPLITERCHAR ","
 
 #include <iostream>
 #include <string>
@@ -37,8 +31,7 @@ public:
 	~ERModel();
 	void addNode(string, string);
 	void addConnection(int, int, string);
-	void setPrimaryKeyEntity(int);
-	void setPrimaryKeyAttribute(string);
+	void setPrimaryKey(int, string);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
@@ -47,9 +40,12 @@ public:
 	string checkConnectionState(Component*, Component*);
 	string getCheckConnectionStateMessage(int, int);
 	string getComponentsTable(string);
+	string getComponentDataList(string, vector<Component*>);
 	string getConnectionTable();
+	string searchAttributeOfEntity(int);
 	string integerToString(int);
 	Component* searchComponent(int);
+	vector<int> splitPrimaryKey(string);
 private:
 	int componentID;
 	vector<Component*> components;

@@ -41,48 +41,28 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	Check Connection hasn't any error. If it has, return error message.
+/////////////////////////////////////////////////////////////////////////////////////////
 string ERModel::checkConnectionState( Component* sourceNode, Component* destinationNode )
 {
-	if(!connectedItself(sourceNode, destinationNode))				// Node not connected itself.
-	{
-		if (connectedTypeCheck(sourceNode, destinationNode))		// Node type is connected with the other node.
-		{
-			if (!connectedAlready(sourceNode, destinationNode))		// Node hasn't the connection with the other node.
-				return TEXT_CONNECTION_FINISH;
-			else
-				return TEXT_ERROR_MESSAGEBEGIN + integerToString(sourceNode->getID()) + TEXT_CONNECTION_ALREADYCONNECTION + integerToString(destinationNode->getID()) + TEXT_CONNECTION_TEXTEND;
-		}
-		else
-			return TEXT_ERROR_MESSAGEBEGIN + integerToString(destinationNode->getID()) + TEXT_CONNECTION_NOTCONNECTION + integerToString(sourceNode->getID()) + TEXT_CONNECTION_TEXTEND;
-	}
-	else
-		return TEXT_ERROR_MESSAGEBEGIN + integerToString(sourceNode->getID()) + TEXT_CONNECTION_ITSELFCONNECTION;
+	return sourceNode->canConnectTo(destinationNode);
 }
 
-bool ERModel::connectedItself( Component* sourceNode, Component* destinationNode )
+//////////////////////////////////////////////////////////////////////////
+//	The method provides to textUI to get connection error message.
+//////////////////////////////////////////////////////////////////////////
+string ERModel::getCheckConnectionStateMessage( int sourceNodeID, int destinationNodeID )
 {
-	if (sourceNode->getID() == destinationNode->getID())
-		return true;
-	else
-		return false;
+	Component* sourceNode = searchComponent(sourceNodeID);
+	Component* desinationNode = searchComponent(destinationNodeID);
+
+	return checkConnectionState(sourceNode, desinationNode);
 }
 
-bool ERModel::connectedTypeCheck( Component* sourceNode, Component* destinationNode )
-{
-	if (sourceNode->canConnectTo(destinationNode))
-		return true;
-	else
-		return false;
-}
-
-bool ERModel::connectedAlready( Component* sourceNode, Component* destinationNode)
-{
-	if (sourceNode->searchConnections(destinationNode->getID()))
-		return true;
-	else
-		return false;
-}
-
+//////////////////////////////////////////////////////////////////////////
+//	Using nodeID to search node, and return pointer of node
+//////////////////////////////////////////////////////////////////////////
 Component* ERModel::searchComponent( int searchNodeID )
 {
 	for( int i = 0; i < components.size(); i++)
@@ -95,6 +75,9 @@ Component* ERModel::searchComponent( int searchNodeID )
 	return NULL;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	The method provides to textUI to check the component is exist.
+//////////////////////////////////////////////////////////////////////////
 bool ERModel::searchComponentExist( string searchID , string searchType)
 {
 	stringstream intNum;
@@ -115,7 +98,9 @@ bool ERModel::searchComponentExist( string searchID , string searchType)
 	// Not find!
 	return false;
 }
-
+//////////////////////////////////////////////////////////////////////////
+//	The method provides that typecast integer to string.
+//////////////////////////////////////////////////////////////////////////
 string ERModel::integerToString( int targetNum )
 {
 	stringstream intNum;
@@ -128,34 +113,44 @@ string ERModel::integerToString( int targetNum )
 	return intToStringNum;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	The method can search specific type from specific vector of component,
+//	and return dataList of the specific vector of component.
+//////////////////////////////////////////////////////////////////////////
+string ERModel::getComponentDataList( string type, vector<Component*> componentVector ) 
+{
+	string ComponentDataList;
+
+	for (vector<Component*>::iterator contents = componentVector.begin(); contents != componentVector.end(); ++contents) 
+	{
+		if (((Component*)*contents)->getType() == type || type == PARAMETER_ALL)
+		{
+			ComponentDataList += TEXT_TWOSPACE + ((Component*)*contents)->getType() + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + integerToString(((Component*)*contents)->getID()) + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + ((Component*)*contents)->getText() + TEXT_ENDLINE;
+		}
+	}	
+	return ComponentDataList;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	The method can search specific tpye or all type, 
+//	and return the result (string).
+//////////////////////////////////////////////////////////////////////////
 string ERModel::getComponentsTable(string type)
 {
 	string componentTableString;
 
 	if (components.size() != 0)
 	{
-		for (vector<Component*>::iterator contents = components.begin(); contents != components.end(); ++contents) {
-			if (((Component*)*contents)->getType() == type || type == PARAMETER_ALL)
-			{
-				componentTableString += TEXT_TWOSPACE + ((Component*)*contents)->getType() + TEXT_SPACELINE
-					+ TEXT_TWOSPACE + integerToString(((Component*)*contents)->getID()) + TEXT_SPACELINE
-					+ TEXT_TWOSPACE + ((Component*)*contents)->getText() + TEXT_ENDLINE;
-			}
-		}
+		componentTableString = getComponentDataList(type, components);
+
 		return componentTableString;
 	}
 	return PARAMETER_SPACE;
 }
 
-string ERModel::getCheckConnectionStateMessage( int sourceNodeID, int destinationNodeID )
-{
-	Component* sourceNode = searchComponent(sourceNodeID);
-	Component* desinationNode = searchComponent(destinationNodeID);
-
-	return checkConnectionState(sourceNode, desinationNode);
-}
-
-std::string ERModel::getConnectionTable()
+string ERModel::getConnectionTable()
 {
 	string connectionsTableString;
 
@@ -172,23 +167,52 @@ std::string ERModel::getConnectionTable()
 	return PARAMETER_SPACE;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	The method provide to textUI to check whether set cardinality or not.
+//////////////////////////////////////////////////////////////////////////
 bool ERModel::checkSetCardinality( int sourceNodeID, int destinationNodeID )
 {
 	Component* sourceNode = searchComponent(sourceNodeID);
 	Component* desinationNode = searchComponent(destinationNodeID);
 
-	if((sourceNode->getType() == PARAMETER_ENTITY && desinationNode->getType() == PARAMETER_RELATIONSHOP) || (sourceNode->getType() == PARAMETER_RELATIONSHOP && desinationNode->getType() == PARAMETER_ENTITY))
+	if((sourceNode->getType() == PARAMETER_ENTITY && desinationNode->getType() == PARAMETER_RELATIONSHOP) || 
+		(sourceNode->getType() == PARAMETER_RELATIONSHOP && desinationNode->getType() == PARAMETER_ENTITY))
 		return true;
 	else
 		return false;
 }
 
-void ERModel::setPrimaryKeyEntity( int entityNodeID )
+void ERModel::setPrimaryKey( int entityNodeID, string attributeNodeID )
 {
+	vector<int> primaryKeySet = splitPrimaryKey(attributeNodeID);
 
 }
 
-void ERModel::setPrimaryKeyAttribute( string attributeNodeID)
+std::string ERModel::searchAttributeOfEntity( int entityID )
 {
+	string attributeOfEntityDataList;
+	Component* specificEntityNode = searchComponent(entityID);
 
+	return getComponentDataList(PARAMETER_ATTRIBUTE, specificEntityNode->getConnections());
+}
+
+vector<int> ERModel::splitPrimaryKey( string primayKeys )
+{
+	string::size_type pos;
+	vector<int> primaryKeySet;
+
+	primayKeys += SPLITERCHAR;
+	int size = primayKeys.size();
+
+	for (int i = 0; i < size; i++)
+	{
+		pos = primayKeys.find(SPLITERCHAR,i);
+		if (pos < size)
+		{
+			string tempSubString = primayKeys.substr(i, pos - i);
+			primaryKeySet.push_back(atoi(tempSubString.c_str()));
+			i = pos;
+		}
+	}
+	return primaryKeySet;
 }
