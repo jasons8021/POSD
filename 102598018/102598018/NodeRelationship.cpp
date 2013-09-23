@@ -5,7 +5,7 @@ NodeRelationship::NodeRelationship()
 
 }
 
-NodeRelationship::NodeRelationship( int id, string text ) : Node( id ,text )
+NodeRelationship::NodeRelationship( int id, string text ) : Node( id, "R", text )
 {
 }
 

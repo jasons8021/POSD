@@ -17,8 +17,6 @@ void ERModel::addNode( string type, string text )
 {
 	Component* newComponent;
 	ComponentFactory componentFactory;
-
-	componentID = 0;
 	
 	newComponent = componentFactory.creatComponent(++componentID, type, text);
   	components.push_back(newComponent);

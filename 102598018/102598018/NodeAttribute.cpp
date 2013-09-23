@@ -5,7 +5,7 @@ NodeAttribute::NodeAttribute()
 
 }
 
-NodeAttribute::NodeAttribute( int id, string text ) : Node()
+NodeAttribute::NodeAttribute( int id, string text ) : Node( id, "A", text )
 {
 }
 

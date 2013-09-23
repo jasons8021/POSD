@@ -4,7 +4,7 @@ NodeEntity::NodeEntity()
 {
 }
 
-NodeEntity::NodeEntity( int id, string text ) : Node( id, text )
+NodeEntity::NodeEntity( int id, string text ) : Node( id, "E", text )
 {
 }
 

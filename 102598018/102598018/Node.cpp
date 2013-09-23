@@ -5,7 +5,7 @@ Node::Node() : Component()
 {
 }
 
-Node::Node( int id ,string text ) : Component( id ,text )
+Node::Node( int id, string type, string text ) : Component( id, type, text )
 {
 }
 

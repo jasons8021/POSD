@@ -7,7 +7,7 @@ Component::Component()
 // 	this->text = text;
 }
 
-Component::Component(int id, string text)
+Component::Component(int id, string type, string text)
 {
 	this->id = id;
 	this->type = type;

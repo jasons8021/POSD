@@ -10,7 +10,7 @@ class Component
 {
 public:
 	Component();
-	Component(int, string);
+	Component(int, string, string);
 	~Component();
 	int getID();
 	string getType();
