@@ -1,7 +1,10 @@
 #ifndef NODEENTITY
 #define NODEENTITY
 
-#include <QtCore/QCoreApplication>
+#define PARAMETER_ATTRIBUTE "A"
+#define PARAMETER_ENTITY "E"
+#define PARAMETER_RELATIONSHOP "R"
+
 #include <vector>
 #include "Node.h"
 
@@ -13,10 +16,8 @@ public:
 	NodeEntity();
 	NodeEntity(int, string);
 	~NodeEntity();
-	void connectTo(Component*);
-	bool canConnectTo(Component*);
-private:
-	vector<Node> connections;
+	virtual void connectTo(Component*);
+	virtual bool canConnectTo(Component*);
 };
 
 #endif

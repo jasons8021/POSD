@@ -79,7 +79,7 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
-    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="Connector.cpp" />
     <ClCompile Include="ERModel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -91,7 +91,7 @@
   <ItemGroup>
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />
-    <ClInclude Include="Connection.h" />
+    <ClInclude Include="Connector.h" />
     <ClInclude Include="ERModel.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="NodeAttribute.h" />

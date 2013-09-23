@@ -1,7 +1,6 @@
 #ifndef NODE
 #define NODE
 
-#include <QtCore/QCoreApplication>
 #include <vector>
 #include "Component.h"
 
@@ -12,10 +11,8 @@ public:
 	Node();
 	Node(int, string, string);
 	~Node();
-	void connectTo(Component*);
-	bool canConnectTo(Component*);
-private:
-	vector<Node> connections;
+	virtual void connectTo(Component*);
+	virtual bool canConnectTo(Component*);
 };
 
 #endif

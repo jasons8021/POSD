@@ -1,7 +1,7 @@
 #ifndef COMPONENT
 #define COMPONENT
 
-#include <QtCore/QCoreApplication>
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -15,15 +15,15 @@ public:
 	int getID();
 	string getType();
 	string getText();
-	void setID(int);
-	void setType(string);
-	void setText(string);
-	void connectTo(Component*);
-	bool canConnectTo(Component*);
+	bool searchConnections(int);
+	void pushConnection(Component*);
+	virtual void connectTo(Component*);
+	virtual bool canConnectTo(Component*);
 private:
 	int id;
 	string type;
 	string text;
+	vector<Component*> connections;
 };
 
 #endif

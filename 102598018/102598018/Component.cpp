@@ -2,9 +2,6 @@
 
 Component::Component()
 {
-// 	this->id = id;
-// 	this->type = type;
-// 	this->text = text;
 }
 
 Component::Component(int id, string type, string text)
@@ -34,13 +31,36 @@ string Component::getText()
 	return this->text;
 }
 
-void Component::connectTo( Component* )
+void Component::connectTo( Component* targetNode )
 {
-
+	// TargetNode isn't in connections
+	if(!(searchConnections(targetNode->getID())))
+	{
+		pushConnection(targetNode);								// Push connected Node into connections
+		targetNode->pushConnection(this);
+	}
 }
 
-bool Component::canConnectTo( Component* )
+bool Component::canConnectTo( Component* TargetNode )
 {
-	return true;
+	// The method is implemeneted by derived class.
+	return false;
+}
+
+bool Component::searchConnections( int searchID )
+{
+	for( int i = 0; i < connections.size(); i++)
+	{
+		// find!
+		if (connections[i]->getID() == searchID)
+			return true;
+	}
+	// Not find!
+	return false;
+}
+
+void Component::pushConnection( Component* connectedNode)
+{
+	connections.push_back(connectedNode);
 }
 
