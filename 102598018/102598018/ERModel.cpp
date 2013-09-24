@@ -10,6 +10,9 @@ ERModel::~ERModel()
 	components.clear();
 }
 
+//////////////////////////////////////////////////////////////////////////
+//						Choice 1. AddNode								//
+//////////////////////////////////////////////////////////////////////////
 void ERModel::addNode( string type, string text )
 {
 	Component* newComponent = new Component();
@@ -19,6 +22,9 @@ void ERModel::addNode( string type, string text )
   	components.push_back(newComponent);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//						Choice 2. AddConnection							//
+//////////////////////////////////////////////////////////////////////////
 void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string text )
 {
 	Component* sourceNode = searchComponent(sourceNodeID);
@@ -41,17 +47,13 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////
 //	Check Connection hasn't any error. If it has, return error message.
-/////////////////////////////////////////////////////////////////////////////////////////
 string ERModel::checkConnectionState( Component* sourceNode, Component* destinationNode )
 {
 	return sourceNode->canConnectTo(destinationNode);
 }
 
-//////////////////////////////////////////////////////////////////////////
 //	The method provides to textUI to get connection error message.
-//////////////////////////////////////////////////////////////////////////
 string ERModel::getCheckConnectionStateMessage( int sourceNodeID, int destinationNodeID )
 {
 	Component* sourceNode = searchComponent(sourceNodeID);
@@ -60,9 +62,89 @@ string ERModel::getCheckConnectionStateMessage( int sourceNodeID, int destinatio
 	return checkConnectionState(sourceNode, desinationNode);
 }
 
+//	The method provide to textUI to check whether set cardinality or not.
+bool ERModel::checkSetCardinality( int sourceNodeID, int destinationNodeID )
+{
+	Component* sourceNode = searchComponent(sourceNodeID);
+	Component* desinationNode = searchComponent(destinationNodeID);
+
+	if((sourceNode->getType() == PARAMETER_ENTITY && desinationNode->getType() == PARAMETER_RELATIONSHOP) || 
+		(sourceNode->getType() == PARAMETER_RELATIONSHOP && desinationNode->getType() == PARAMETER_ENTITY))
+		return true;
+	else
+		return false;
+}
+
 //////////////////////////////////////////////////////////////////////////
+//						Choice 3. GetTable								//
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//	The method can search specific tpye or all type , 
+//	and return the Component vector's data list (string).
+//////////////////////////////////////////////////////////////////////////
+string ERModel::getComponentsTable(string type)
+{
+	string componentTableString;
+
+	if (components.size() != 0)
+	{
+		componentTableString = getComponentDataList(type, components);
+
+		return componentTableString;
+	}
+	return PARAMETER_SPACE;
+}
+string ERModel::getConnectionTable()
+{
+	string connectionsTableString;
+
+	if (connections.size() != 0)
+	{
+		for (vector<Connector*>::iterator contents = connections.begin(); contents != connections.end(); ++contents) {
+			connectionsTableString += TEXT_FIVESPACE + integerToString(((Connector*)*contents)->getID()) +  TEXT_TWOSPACE + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + integerToString(((Connector*)*contents)->getSourceNodeID()) + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + integerToString(((Connector*)*contents)->getDestinationNodeID()) + TEXT_SPACELINE + TEXT_ENDLINE;
+		}
+		return connectionsTableString;
+	}
+
+	return PARAMETER_SPACE;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//						Choice 4. SetPrimaryKey							//
+//////////////////////////////////////////////////////////////////////////
+
+void ERModel::setPrimaryKey( int entityNodeID, vector<int> primaryKeys )
+{
+	Component* entityNode = searchComponent(entityNodeID);
+	static_cast<NodeEntity*>(entityNode);
+	for (int i = 0; i < primaryKeys.size(); i++)
+		static_cast<NodeEntity*>(entityNode)->setPrimaryKey(primaryKeys[i]);
+}
+
+string ERModel::searchAttributeOfEntity( int entityID )
+{
+	string attributeOfEntityDataList;
+	Component* specificEntityNode = searchComponent(entityID);
+
+	return getComponentDataList(PARAMETER_ATTRIBUTE, specificEntityNode->getConnections());
+}
+
+bool ERModel::searchEntityConnection( int entityID, int targetNodeID, string targetType)
+{
+	Component* entityNode = searchComponent(entityID);
+	
+	return searchComponentConnection(targetNodeID, targetType, entityNode->getConnections());
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//							General Function							//
+//////////////////////////////////////////////////////////////////////////
+
 //	Using nodeID to search node, and return pointer of node
-//////////////////////////////////////////////////////////////////////////
 Component* ERModel::searchComponent( int searchNodeID )
 {
 	for( int i = 0; i < components.size(); i++)
@@ -75,10 +157,21 @@ Component* ERModel::searchComponent( int searchNodeID )
 	return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
+//	The method is searching the nodeID in connections of the target component. 
+bool ERModel::searchComponentConnection( int searchNodeID, string searchType,vector<Component*> targetComponent )
+{
+	for( int i = 0; i < targetComponent.size(); i++)
+	{
+		// Find!
+		if (targetComponent[i]->getID() == searchNodeID && targetComponent[i]->getType() == searchType)
+			return true;
+	}
+	// Not find!
+	return NULL;
+}
+
 //	The method provides to textUI to check the component is exist.
-//////////////////////////////////////////////////////////////////////////
-bool ERModel::searchComponentExist( string searchID , string searchType)
+bool ERModel::searchComponentExist( string searchID, string searchType)
 {
 	stringstream intNum;
 	string intToStringNum;
@@ -98,14 +191,18 @@ bool ERModel::searchComponentExist( string searchID , string searchType)
 	// Not find!
 	return false;
 }
-//////////////////////////////////////////////////////////////////////////
+
+bool ERModel::searchComponentExist( int searchID, string searchType )
+{
+	return searchComponentExist(integerToString(searchID), searchType);
+}
+
 //	The method provides that typecast integer to string.
-//////////////////////////////////////////////////////////////////////////
 string ERModel::integerToString( int targetNum )
 {
 	stringstream intNum;
 	string intToStringNum;
-	
+
 	// int to string
 	intNum << targetNum; // int to stringstream
 	intNum >> intToStringNum; // stringstream to string
@@ -117,11 +214,11 @@ string ERModel::integerToString( int targetNum )
 //	The method can search specific type from specific vector of component,
 //	and return dataList of the specific vector of component.
 //////////////////////////////////////////////////////////////////////////
-string ERModel::getComponentDataList( string type, vector<Component*> componentVector ) 
+string ERModel::getComponentDataList( string type, vector<Component*> targetComponents ) 
 {
 	string ComponentDataList;
 
-	for (vector<Component*>::iterator contents = componentVector.begin(); contents != componentVector.end(); ++contents) 
+	for (vector<Component*>::iterator contents = targetComponents.begin(); contents != targetComponents.end(); ++contents) 
 	{
 		if (((Component*)*contents)->getType() == type || type == PARAMETER_ALL)
 		{
@@ -131,88 +228,4 @@ string ERModel::getComponentDataList( string type, vector<Component*> componentV
 		}
 	}	
 	return ComponentDataList;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//	The method can search specific tpye or all type, 
-//	and return the result (string).
-//////////////////////////////////////////////////////////////////////////
-string ERModel::getComponentsTable(string type)
-{
-	string componentTableString;
-
-	if (components.size() != 0)
-	{
-		componentTableString = getComponentDataList(type, components);
-
-		return componentTableString;
-	}
-	return PARAMETER_SPACE;
-}
-
-string ERModel::getConnectionTable()
-{
-	string connectionsTableString;
-
-	if (connections.size() != 0)
-	{
-		for (vector<Connector*>::iterator contents = connections.begin(); contents != connections.end(); ++contents) {
-			connectionsTableString += TEXT_FIVESPACE + integerToString(((Connector*)*contents)->getID()) +  TEXT_TWOSPACE + TEXT_SPACELINE
-				+ TEXT_TWOSPACE + integerToString(((Connector*)*contents)->getSourceNodeID()) + TEXT_SPACELINE
-				+ TEXT_TWOSPACE + integerToString(((Connector*)*contents)->getDestinationNodeID()) + TEXT_SPACELINE + TEXT_ENDLINE;
-		}
-		return connectionsTableString;
-	}
-
-	return PARAMETER_SPACE;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//	The method provide to textUI to check whether set cardinality or not.
-//////////////////////////////////////////////////////////////////////////
-bool ERModel::checkSetCardinality( int sourceNodeID, int destinationNodeID )
-{
-	Component* sourceNode = searchComponent(sourceNodeID);
-	Component* desinationNode = searchComponent(destinationNodeID);
-
-	if((sourceNode->getType() == PARAMETER_ENTITY && desinationNode->getType() == PARAMETER_RELATIONSHOP) || 
-		(sourceNode->getType() == PARAMETER_RELATIONSHOP && desinationNode->getType() == PARAMETER_ENTITY))
-		return true;
-	else
-		return false;
-}
-
-void ERModel::setPrimaryKey( int entityNodeID, string attributeNodeID )
-{
-	vector<int> primaryKeySet = splitPrimaryKey(attributeNodeID);
-
-}
-
-std::string ERModel::searchAttributeOfEntity( int entityID )
-{
-	string attributeOfEntityDataList;
-	Component* specificEntityNode = searchComponent(entityID);
-
-	return getComponentDataList(PARAMETER_ATTRIBUTE, specificEntityNode->getConnections());
-}
-
-vector<int> ERModel::splitPrimaryKey( string primayKeys )
-{
-	string::size_type pos;
-	vector<int> primaryKeySet;
-
-	primayKeys += SPLITERCHAR;
-	int size = primayKeys.size();
-
-	for (int i = 0; i < size; i++)
-	{
-		pos = primayKeys.find(SPLITERCHAR,i);
-		if (pos < size)
-		{
-			string tempSubString = primayKeys.substr(i, pos - i);
-			primaryKeySet.push_back(atoi(tempSubString.c_str()));
-			i = pos;
-		}
-	}
-	return primaryKeySet;
 }

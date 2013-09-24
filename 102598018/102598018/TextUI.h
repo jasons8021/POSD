@@ -39,7 +39,10 @@
 #define TEXT_SETPRIMARYKEY_ENTERNODEID "Enter the ID of the entity:\n> "
 #define TEXT_SETPRIMARYKEY_ATTRIBUTEOFENTITY "Attributes of the entity '"
 #define TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE "Enter the IDs of the attributes (use a comma to separate two attributes):\n> "
-
+#define TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_1 "' does not belong to Entity '"
+#define TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_2 "'. Please enter a valid one again.\n> "
+#define TEXT_SETPRIMARYKEY_SETPKFINISH_1 "' has the primary key ("
+#define TEXT_SETPRIMARYKEY_SETPKFINISH_2 ")."
 
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
@@ -57,6 +60,7 @@
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_CARDINALITYOPTION_ONE "1"
 #define PARAMETER_CARDINALITYOPTION_TWO "N"
+#define PARAMETER_INITIALSEARCH "initial search"
 
 #define SPLITERCHAR ","
 
@@ -87,6 +91,9 @@ public:
 	void processCommand();
 	string searchComponent(string);
 	string searchEntity(string);
+	string integerToString(int);
+	vector<int> searchAttribute(string);
+	vector<int> splitPrimaryKey(string);
 private:
 	ERModel* erModel;
 	bool isDisplayComponentsTable;

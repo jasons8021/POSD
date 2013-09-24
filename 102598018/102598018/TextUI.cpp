@@ -170,18 +170,26 @@ string TextUI::searchComponent( string searchType )
 void TextUI::setPrimaryKey()
 {
 	string entityNodeID;
-	string AttributeNodeID;
+	string attributeNodeIDSet;
+	vector<int> primaryKeys;
 
 	displayEntityTable();
 
 	cout << TEXT_SETPRIMARYKEY_ENTERNODEID;
 	entityNodeID = searchEntity(PARAMETER_ENTITY);
 
-	cout << TEXT_SETPRIMARYKEY_ATTRIBUTEOFENTITY << entityNodeID << TEXT_SETPRIMARYKEY_ENDTEXT;
+	cout << TEXT_SETPRIMARYKEY_ATTRIBUTEOFENTITY << entityNodeID << TEXT_SETPRIMARYKEY_ENDTEXT << endl;
 	displayAttributeTable(atoi(entityNodeID.c_str()));
 	cout << TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE;
-	cin >> AttributeNodeID;
+	
+	primaryKeys = searchAttribute(entityNodeID);
+	erModel->setPrimaryKey(atoi(entityNodeID.c_str()), primaryKeys);
+	
+	for (int i = 0; i < primaryKeys.size(); i++)
+		attributeNodeIDSet += integerToString(primaryKeys[i]) + SPLITERCHAR;
+	attributeNodeIDSet = attributeNodeIDSet.substr(0, 2*primaryKeys.size()-1);
 
+	cout << TEXT_NODENUMBEGIN << entityNodeID << TEXT_SETPRIMARYKEY_SETPKFINISH_1 << attributeNodeIDSet << TEXT_SETPRIMARYKEY_SETPKFINISH_2 << endl;
 }
 
 string TextUI::searchEntity( string searchType )
@@ -201,6 +209,60 @@ string TextUI::searchEntity( string searchType )
 	return searchID;
 }
 
+vector<int> TextUI::searchAttribute( string entityNodeID )
+{
+	string attributeNodeID;
+	string errorMessage = PARAMETER_INITIALSEARCH;
+	vector<int> primaryKeys;
+
+	cin >> attributeNodeID;
+	primaryKeys = splitPrimaryKey(attributeNodeID);
+
+	
+	while(true)
+	{
+		errorMessage = PARAMETER_SPACE;
+		for (int i = 0; i < primaryKeys.size(); i++)
+		{
+			if (!erModel->searchComponentExist(primaryKeys[i], PARAMETER_ALL))												// The component is not exist.
+				errorMessage += TEXT_CONNECTION_ERRORNODE;
+			else if (!erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		// The component type is not attribute.
+				errorMessage += TEXT_NODENUMBEGIN + integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_1 + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_2;
+		}
+		if (errorMessage != PARAMETER_SPACE)
+			cout << errorMessage;
+		else
+			break;
+
+		primaryKeys.clear();
+		cin >> attributeNodeID;
+		primaryKeys = splitPrimaryKey(attributeNodeID);
+	}
+	
+	return primaryKeys;
+}
+
+vector<int> TextUI::splitPrimaryKey( string primaryKeys )
+{
+	string::size_type pos;
+	vector<int> primaryKeySet;
+
+	primaryKeys += SPLITERCHAR;
+	int size = primaryKeys.size();
+
+	for (int i = 0; i < size; i++)
+	{
+		pos = primaryKeys.find(SPLITERCHAR,i);
+		if (pos < size)
+		{
+			string tempSubString = primaryKeys.substr(i, pos - i);
+			primaryKeySet.push_back(atoi(tempSubString.c_str()));
+			i = pos;
+		}
+	}
+	return primaryKeySet;
+}
+
 void TextUI::displayEntityTable()
 {
 	// EntityTable format
@@ -217,10 +279,9 @@ void TextUI::displayEntityTable()
 	
 }
 
-void TextUI::displayAttributeTable( int entityID)
+void TextUI::displayAttributeTable( int entityID )
 {
 	// AttributeTable format
-	cout << TEXT_SETPRIMARYKEY_ENTITYTITLE << endl;
 	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
 	cout << TEXT_COMPONENT_TABLEFORMAT << endl;
 	cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
@@ -230,4 +291,16 @@ void TextUI::displayAttributeTable( int entityID)
 
 	// ComponentTable End
 	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
+}
+
+string TextUI::integerToString( int targetNum )
+{
+	stringstream intNum;
+	string intToStringNum;
+
+	// int to string
+	intNum << targetNum; // int to stringstream
+	intNum >> intToStringNum; // stringstream to string
+
+	return intToStringNum;
 }

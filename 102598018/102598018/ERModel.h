@@ -31,12 +31,15 @@ public:
 	~ERModel();
 	void addNode(string, string);
 	void addConnection(int, int, string);
-	void setPrimaryKey(int, string);
+	void setPrimaryKey(int, vector<int>);
+	bool searchComponentExist(int, string);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
 	bool connectedAlready(Component*, Component*);
 	bool checkSetCardinality(int, int);
+	bool searchComponentConnection(int, string, vector<Component*>);
+	bool searchEntityConnection(int, int, string);
 	string checkConnectionState(Component*, Component*);
 	string getCheckConnectionStateMessage(int, int);
 	string getComponentsTable(string);
@@ -45,7 +48,6 @@ public:
 	string searchAttributeOfEntity(int);
 	string integerToString(int);
 	Component* searchComponent(int);
-	vector<int> splitPrimaryKey(string);
 private:
 	int componentID;
 	vector<Component*> components;
