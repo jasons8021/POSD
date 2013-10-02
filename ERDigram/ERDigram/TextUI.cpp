@@ -27,6 +27,14 @@ void TextUI::processCommand()
 	cin >> choice;
 	switch(atoi(choice.c_str()))
 	{
+	case Load:
+		cout << "Load" << endl;
+		displayMenu();
+		break;
+	case Save:
+		saveERDiagram();
+		displayMenu();
+		break;
 	case Add:
 		addNewNode();
 		displayComponentTable();
@@ -332,4 +340,12 @@ void TextUI::displayERDiagramTable()
 void TextUI::exitERDiagram()
 {
 	cout << TEXT_GOODBYE;
+}
+
+void TextUI::saveERDiagram()
+{
+	string fileName;
+	cout << "please enter file name";
+	cin >> fileName;
+	_erModel->saveERDiagram(fileName);
 }

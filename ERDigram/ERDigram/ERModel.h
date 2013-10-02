@@ -11,6 +11,7 @@
 #define TEXT_FIVESPACE "     "
 #define TEXT_SPACELINE "   |"
 #define TEXT_LINESPACE "|  "
+#define TEXT_COMMASPACE ", "
 #define TEXT_ENDLINE "\n"
 
 #define PARAMETER_SPACE ""
@@ -22,7 +23,9 @@
 #define PARAMETER_RELATIONSHIPLOWERBOUND 2
 #define SPLITERCHAR ","
 
+
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -41,6 +44,7 @@ public:
 	void setCardinality(Component*, Component*, string);
 	void setPrimaryKey(vector<int>);
 	void setForeignKey();
+	void saveERDiagram(string);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);

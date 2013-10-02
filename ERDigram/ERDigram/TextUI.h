@@ -2,7 +2,7 @@
 #define TEXTUI_H_
 
 // Menu text set.
-#define TEXT_MENU "1. Add a node\n2. Connect two nodes\n3. Display the current diagram\n4. Set a primary key\n5. Display the table\n6. Exit\n> "
+#define TEXT_MENU "1. Load ER diagram file\n2. Save ER diagram file\n3. Add a node\n4. Connect two nodes\n5. Display the current diagram\n6. Set a primary key\n7. Display the table\n8. Delete a component\n9. Undo\n10.Redo\n11. Exit\n> "
 #define TEXT_MENU_ERRORCHOICE "You entered a invalid number. Please enter a valid number again.\n> "
 
 // General text set
@@ -51,6 +51,9 @@
 // Choice 6. GoodBye
 #define TEXT_GOODBYE "Goodbye!"
 
+// Choice 7. Load/Save ERDiagram
+
+
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
 #define TEXT_DEMARCATION_CONNECTIONTABLE "--------------------------"
@@ -82,7 +85,7 @@
 
 using namespace std;
 
-enum Option{Add = 1, Connect, GetTable, SetPK, GetERTable, Exit};
+enum Option{Add=1, Connect, GetTable, SetPK, GetERTable, Delete, Undo, Redo, Exit,Load, Save};
 enum Cardinality{CardinalityOptionOne, CardinalityOptionTwo};
 
 class TextUI
@@ -101,6 +104,7 @@ public:
 	void displayERDiagramTable();
 	void processCommand();
 	void exitERDiagram();
+	void saveERDiagram();
 	string searchComponent(string);
 	string searchEntity(string);
 	string integerToString(int);

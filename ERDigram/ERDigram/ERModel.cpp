@@ -17,7 +17,7 @@ ERModel::~ERModel()
 }
 
 //////////////////////////////////////////////////////////////////////////
-//						Choice 1. AddNode								//
+//								AddNode									//
 //////////////////////////////////////////////////////////////////////////
 void ERModel::addNode( string type, string text )
 {
@@ -31,7 +31,7 @@ void ERModel::addNode( string type, string text )
 }
 
 //////////////////////////////////////////////////////////////////////////
-//						Choice 2. AddConnection							//
+//							AddConnection								//
 //////////////////////////////////////////////////////////////////////////
 void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string text )
 {
@@ -107,7 +107,7 @@ void ERModel::setCardinality( Component* sourceNode, Component* destinationNode,
 
 
 //////////////////////////////////////////////////////////////////////////
-//						Choice 3. GetTable								//
+//								GetTable								//
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ string ERModel::getConnectionTable()
 }
 
 //////////////////////////////////////////////////////////////////////////
-//						Choice 4. SetPrimaryKey							//
+//							SetPrimaryKey								//
 //////////////////////////////////////////////////////////////////////////
 
 void ERModel::setPrimaryKey( vector<int> primaryKeys )
@@ -173,7 +173,7 @@ bool ERModel::searchEntityConnection( int entityID, int targetNodeID, string tar
 }
 
 //////////////////////////////////////////////////////////////////////////
-//						Choice 5. Show ERDiagram						//
+//							Show ERDiagram								//
 //////////////////////////////////////////////////////////////////////////
 
 string ERModel::getERDiagramTable()
@@ -321,6 +321,29 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 
 	return isFKString;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//								Load/Save								//
+//////////////////////////////////////////////////////////////////////////
+
+void ERModel::saveERDiagram( string fileName )
+{
+	ofstream erDiagramFile;
+
+	erDiagramFile.open("C:\\ERD\\"+fileName, ios::out);
+	if (!erDiagramFile)
+		exit(1);
+	for ( int i = 0; i < _components.size(); i++)
+	{
+		if (_components[i]->getText() == PARAMETER_SPACE)
+			erDiagramFile << _components[i]->getType() << TEXT_ENDLINE;
+		else
+			erDiagramFile << _components[i]->getType() << TEXT_COMMASPACE <<  _components[i]->getText() << TEXT_ENDLINE;
+	}
+	erDiagramFile.close();
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //							General Function							//
