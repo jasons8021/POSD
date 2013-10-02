@@ -328,11 +328,13 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 
 void ERModel::saveERDiagram( string fileName )
 {
-	ofstream erDiagramFile;
+	ofstream erDiagramFile(fileName);
 
-	erDiagramFile.open("C:\\ERD\\"+fileName, ios::out);
-	if (!erDiagramFile)
-		exit(1);
+	if (!erDiagramFile.is_open())
+	{
+		_mkdir("C:\\ERD");
+		//exit(1);
+	}
 	for ( int i = 0; i < _components.size(); i++)
 	{
 		if (_components[i]->getText() == PARAMETER_SPACE)

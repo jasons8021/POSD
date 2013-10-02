@@ -29,6 +29,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <direct.h>
 #include "Component.h"
 #include "ComponentFactory.h"
 
