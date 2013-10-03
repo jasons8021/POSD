@@ -3,7 +3,6 @@
 
 #define TEXT_GETERDIAGRAM_ENDKEY ")"
 #define TEXT_GETERDIAGRAM_PK "PK("
-#define TEXT_GETERDIAGRAM_SPLITER ", "
 #define TEXT_GETERDIAGRAM_FK ", FK("
 
 #define TEXT_ONESPACE " "
@@ -13,6 +12,7 @@
 #define TEXT_LINESPACE "|  "
 #define TEXT_COMMASPACE ", "
 #define TEXT_ENDLINE "\n"
+#define TEXT_COMMA ","
 
 #define PARAMETER_SPACE ""
 #define PARAMETER_ATTRIBUTE "A"
@@ -21,8 +21,9 @@
 #define PARAMETER_CONNECTOR "C"
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_RELATIONSHIPLOWERBOUND 2
-#define SPLITERCHAR ","
 
+#define SPLITTERBYCOMMA ","
+#define SPLITTERBYBACKSLASH "\\"
 
 #include <iostream>
 #include <fstream>
@@ -32,6 +33,7 @@
 #include <direct.h>
 #include "Component.h"
 #include "ComponentFactory.h"
+#include "Toolkit.h"
 
 using namespace std;
 
@@ -43,9 +45,10 @@ public:
 	void addNode(string, string);
 	void addConnection(int, int, string);
 	void setCardinality(Component*, Component*, string);
-	void setPrimaryKey(vector<int>);
+	void setPrimaryKey(int, vector<int>);
 	void setForeignKey();
 	void saveERDiagram(string);
+	void creatFilePath(string);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
@@ -61,16 +64,18 @@ public:
 	string getConnectionTable();
 	string getERDiagramTable();
 	string searchAttributeOfEntity(int);
-	string integerToString(int);
 	string getAttributeContents(vector<Component*>);
 	string searchForeignKey(int);
+	string saveComponentTable();
+	string saveConnectionTable();
+	string savePrimaryKeyTable();
 	Component* searchComponent(int);
 	vector<int> oneToOne(NodeRelationship*);
-	vector<Component*> getSpecificTypeComponentSet(string, vector<Component*>);
+	vector<Component*> searchSpecificTypeComponentSet(string, vector<Component*>);
 private:
 	int _componentID;
 	vector<Component*> _components;
-	vector<Connector*> _connections;
+	vector<Component*> _connections;
 };
 
 #endif

@@ -7,13 +7,9 @@ ERModel::ERModel()
 
 ERModel::~ERModel()
 {
-// 	for (int i = 0; i < connections.size(); i++)
-// 		delete(connections[i]);
-// 	connections.clear();
-// 
-// 	for (int i = 0; i < components.size(); i++)
-// 		delete(components[i]);
-// 	components.clear();
+	for(int i = 0; i < _components.size(); i++)
+		delete _components[i];
+	_components.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -21,11 +17,10 @@ ERModel::~ERModel()
 //////////////////////////////////////////////////////////////////////////
 void ERModel::addNode( string type, string text )
 {
-	Component* newComponent = new Component();
 	ComponentFactory* componentFactory = new ComponentFactory();
-
-	newComponent = static_cast<Component*>(componentFactory->creatComponent(_componentID++, type, text));
-  	_components.push_back(newComponent);
+	Component* newComponent = static_cast<Component*>(componentFactory->creatComponent(_componentID++, type, text));
+	
+	_components.push_back(newComponent);
 
 	delete(componentFactory);
 }
@@ -38,18 +33,15 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 	Component* sourceNode = searchComponent(sourceNodeID);
 	Component* destinationNode = searchComponent(destinationNodeID);
 
-	Component* newComponent = new Component();
-	Connector* newConnection = new Connector();
+	Component* newConnection;
 	ComponentFactory* componentFactory = new ComponentFactory();
 
 	if (checkConnectionState(sourceNode, destinationNode) == TEXT_CONNECTION_FINISH)
 	{
-		newComponent = static_cast<Component*>(componentFactory->creatComponent(_componentID++, PARAMETER_CONNECTOR, text));
-		_components.push_back(newComponent);
+		newConnection = static_cast<Component*>(componentFactory->creatComponent(_componentID++, PARAMETER_CONNECTOR, text));
+		_components.push_back(newConnection);
 
-		newConnection = (Connector*) newComponent;	
-		// recovery Connector* from Component*
-		newConnection->setConnectedNode(sourceNode, destinationNode);	// set which two node be connected.
+		static_cast<Connector*>(newConnection)->setConnectedNode(sourceNode, destinationNode);
 		_connections.push_back(newConnection);
 
 		sourceNode->connectTo(destinationNode);
@@ -133,9 +125,9 @@ string ERModel::getConnectionTable()
 	if (_connections.size() != 0)
 	{
 		for (int i = 0; i < _connections.size(); i++) {
-			connectionsTableString += TEXT_FIVESPACE + integerToString(_connections[i]->getID()) +  TEXT_TWOSPACE + TEXT_SPACELINE
-				+ TEXT_TWOSPACE + integerToString(_connections[i]->getSourceNodeID()) + TEXT_SPACELINE
-				+ TEXT_TWOSPACE + integerToString(_connections[i]->getDestinationNodeID()) + TEXT_SPACELINE + TEXT_ENDLINE;
+			connectionsTableString += TEXT_FIVESPACE + Toolkit::integerToString(_connections[i]->getID()) +  TEXT_TWOSPACE + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getSourceNodeID()) + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getDestinationNodeID()) + TEXT_SPACELINE + TEXT_ENDLINE;
 		}
 		return connectionsTableString;
 	}
@@ -147,13 +139,15 @@ string ERModel::getConnectionTable()
 //							SetPrimaryKey								//
 //////////////////////////////////////////////////////////////////////////
 
-void ERModel::setPrimaryKey( vector<int> primaryKeys )
+void ERModel::setPrimaryKey( int entityID, vector<int> primaryKeys )
 {
+	NodeEntity* entityNode = static_cast<NodeEntity*>(searchComponent(entityID));
 	Component* attributeNode;
 	for( int i = 0; i < primaryKeys.size(); i++)
 	{
 		attributeNode = searchComponent(primaryKeys[i]);
 		static_cast<NodeAttribute*>(attributeNode)->setIsPrimaryKey(true);
+		entityNode->setPrimaryKey(attributeNode->getID());
 	}
 }
 
@@ -182,7 +176,7 @@ string ERModel::getERDiagramTable()
 	string erDiagramTableString;
 	string primaryKeyString;
 	string notPrimaryKeyString;
-	vector<Component*> entitySet = getSpecificTypeComponentSet(PARAMETER_ENTITY, _components);
+	vector<Component*> entitySet = searchSpecificTypeComponentSet(PARAMETER_ENTITY, _components);
 	vector<Component*> attributeInEntitySet;
 
 	setForeignKey();
@@ -196,7 +190,7 @@ string ERModel::getERDiagramTable()
 			erDiagramRowString += TEXT_ONESPACE;
 
 		erDiagramRowString += TEXT_LINESPACE;
-		attributeInEntitySet = getSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, entitySet[i]->getConnections());
+		attributeInEntitySet = searchSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, entitySet[i]->getConnections());
 		erDiagramRowString += getAttributeContents(attributeInEntitySet);
 		
 		if (!(static_cast<NodeEntity*>(entitySet[i])->getForeignKey()).empty())
@@ -218,9 +212,9 @@ string ERModel::getAttributeContents( vector<Component*> attributeSet)
 	for(int i = 0; i < attributeSet.size(); i++)
 	{
 		if (static_cast<NodeAttribute*>(attributeSet[i])->getIsPrimaryKey())
-			isPKString += attributeSet[i]->getText() + TEXT_GETERDIAGRAM_SPLITER;
+			isPKString += attributeSet[i]->getText() + TEXT_COMMASPACE;
 		else
-			isNotPKString += attributeSet[i]->getText() + TEXT_GETERDIAGRAM_SPLITER;
+			isNotPKString += attributeSet[i]->getText() + TEXT_COMMASPACE;
 	}
 
 	// Delete lastest ", " and set format into string
@@ -232,7 +226,7 @@ string ERModel::getAttributeContents( vector<Component*> attributeSet)
 	if (isNotPKString != PARAMETER_SPACE)
 	{
 		isNotPKString = isNotPKString.substr(0,isNotPKString.size()-2);
-		isNotPKString = TEXT_GETERDIAGRAM_SPLITER + isNotPKString;
+		isNotPKString = TEXT_COMMASPACE + isNotPKString;
 	}
 
 	return isPKString + isNotPKString;
@@ -240,7 +234,7 @@ string ERModel::getAttributeContents( vector<Component*> attributeSet)
 
 void ERModel::setForeignKey()
 {
-	vector<Component*> relationshipSet = getSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _components);
+	vector<Component*> relationshipSet = searchSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _components);
 	vector<int> oneToOneEntityID;	// It store two entity ID which two entity is one to one relationship.
 	NodeEntity* setFKEntityNodeFirst;
 	NodeEntity* setFKEntityNodeSecond;
@@ -285,7 +279,7 @@ vector<int> ERModel::oneToOne( NodeRelationship* relationshipNode )
 
 bool ERModel::checkOneToOne()
 {
-	vector<Component*> relationshipNode = getSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _components);
+	vector<Component*> relationshipNode = searchSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _components);
 
 	// The entityCardinalitySet of Relationship is a set of store relationship between two entities.
 	// The format is (entity, cardinality).
@@ -303,13 +297,13 @@ bool ERModel::checkOneToOne()
 string ERModel::searchForeignKey( int foreignKeyEntityID )
 {
 	Component* foreignKeyEntity = searchComponent(foreignKeyEntityID);
-	vector<Component*> attributeSet = getSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, foreignKeyEntity->getConnections());
+	vector<Component*> attributeSet = searchSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, foreignKeyEntity->getConnections());
 	string isFKString;
 
 	for(int i = 0; i < attributeSet.size(); i++)
 	{
 		if (static_cast<NodeAttribute*>(attributeSet[i])->getIsPrimaryKey())
-			isFKString += attributeSet[i]->getText() + TEXT_GETERDIAGRAM_SPLITER;
+			isFKString += attributeSet[i]->getText() + TEXT_COMMASPACE;
 	}
 
 	// Delete lastest ", " and set format into string
@@ -328,24 +322,94 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 
 void ERModel::saveERDiagram( string fileName )
 {
-	ofstream erDiagramFile(fileName);
+	ofstream erDiagramFile;
+	erDiagramFile.open(fileName);
 
 	if (!erDiagramFile.is_open())
 	{
-		_mkdir("C:\\ERD");
-		//exit(1);
+		creatFilePath(fileName);
+		erDiagramFile.open(fileName);
 	}
-	for ( int i = 0; i < _components.size(); i++)
-	{
-		if (_components[i]->getText() == PARAMETER_SPACE)
-			erDiagramFile << _components[i]->getType() << TEXT_ENDLINE;
-		else
-			erDiagramFile << _components[i]->getType() << TEXT_COMMASPACE <<  _components[i]->getText() << TEXT_ENDLINE;
-	}
+
+	erDiagramFile << saveComponentTable();
+	erDiagramFile << TEXT_ENDLINE;
+	erDiagramFile << saveConnectionTable();
+	erDiagramFile << TEXT_ENDLINE;
+	erDiagramFile << savePrimaryKeyTable();
+
 	erDiagramFile.close();
 }
 
+void ERModel::creatFilePath( string fileName )
+{
+	string filePath;
+	vector<string> splitterFilePath;
 
+	splitterFilePath = Toolkit::splitFunction(fileName,SPLITTERBYBACKSLASH);
+
+	// Final part of splitterFilePath is file name.
+	for (int i = 0; i < (splitterFilePath.size()-1); i++)
+	{
+		if (splitterFilePath[i] != PARAMETER_SPACE)
+			filePath += splitterFilePath[i] + SPLITTERBYBACKSLASH;
+	}
+	_mkdir(filePath.c_str());
+}
+
+string ERModel::saveComponentTable() 
+{
+	string componentTableString;
+
+	for (int i = 0; i < _components.size(); i++)
+	{
+		if (_components[i]->getText() == PARAMETER_SPACE)
+			componentTableString += _components[i]->getType() + TEXT_ENDLINE;
+		else
+			componentTableString += _components[i]->getType() + TEXT_COMMASPACE + _components[i]->getText() + TEXT_ENDLINE;
+	}
+
+	return componentTableString;
+}
+
+string ERModel::saveConnectionTable() 
+{
+	string connectionTableString;
+
+	for (int i = 0; i < _connections.size(); i++) 
+	{
+		connectionTableString += Toolkit::integerToString(_connections[i]->getID()) +  TEXT_ONESPACE 
+			+ Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getSourceNodeID()) + TEXT_COMMA
+			+ Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getDestinationNodeID()) + TEXT_ENDLINE;
+	}
+	return connectionTableString;
+}
+
+string ERModel::savePrimaryKeyTable() 
+{
+	string primaryKeyTableString;
+	// To find all components of entity.
+	vector<Component*> allEntityNode = searchSpecificTypeComponentSet(PARAMETER_ENTITY, _components);
+	vector<int> pkofEntityNode;
+
+	for (int i = 0; i < allEntityNode.size(); i++) 
+	{
+		pkofEntityNode = static_cast<NodeEntity*>(allEntityNode[i])->getPrimaryKey();
+		if (!pkofEntityNode.empty())					// If the PK in entity node is not empty, output them. 
+		{
+			primaryKeyTableString += Toolkit::integerToString(allEntityNode[i]->getID()) + TEXT_ONESPACE; 
+			for (int j = 0; j < pkofEntityNode.size(); j++)
+			{
+				if ( j == pkofEntityNode.size()-1 )		// Final PK
+					primaryKeyTableString += Toolkit::integerToString(pkofEntityNode[j]);
+				else
+					primaryKeyTableString += Toolkit::integerToString(pkofEntityNode[j]) + TEXT_COMMA;
+			}
+		}
+		primaryKeyTableString += TEXT_ENDLINE;
+	}
+	return primaryKeyTableString;
+
+}
 
 //////////////////////////////////////////////////////////////////////////
 //							General Function							//
@@ -399,17 +463,18 @@ bool ERModel::searchComponentExist( string searchID, string searchType)
 	return false;
 }
 
-//	The method provides that typecast integer to string.
-string ERModel::integerToString( int targetNum )
+// Search components which is specific type in target component set, and return the specific components in target component set.
+vector<Component*> ERModel::searchSpecificTypeComponentSet( string type, vector<Component*> targetComponetSet )
 {
-	stringstream intNum;
-	string intToStringNum;
+	vector<Component*> specificTypeComponentSet;
 
-	// int to string
-	intNum << targetNum; // int to stringstream
-	intNum >> intToStringNum; // stringstream to string
+	for( int i = 0; i < targetComponetSet.size(); i++)
+	{
+		if (targetComponetSet[i]->getType() == type)
+			specificTypeComponentSet.push_back(targetComponetSet[i]);
+	}
 
-	return intToStringNum;
+	return specificTypeComponentSet;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -425,23 +490,9 @@ string ERModel::getComponentDataList( string type, vector<Component*> targetComp
 		if (targetComponents[i]->getType() == type || type == PARAMETER_ALL)
 		{
 			ComponentDataList += TEXT_TWOSPACE + targetComponents[i]->getType() + TEXT_SPACELINE
-				+ TEXT_TWOSPACE + integerToString(targetComponents[i]->getID()) + TEXT_SPACELINE
+				+ TEXT_TWOSPACE + Toolkit::integerToString(targetComponents[i]->getID()) + TEXT_SPACELINE
 				+ TEXT_TWOSPACE + targetComponents[i]->getText() + TEXT_ENDLINE;
 		}
 	}	
 	return ComponentDataList;
-}
-
-
-vector<Component*> ERModel::getSpecificTypeComponentSet( string type, vector<Component*> targetComponetSet )
-{
-	vector<Component*> specificTypeComponentSet;
-
-	for( int i = 0; i < targetComponetSet.size(); i++)
-	{
-		if (targetComponetSet[i]->getType() == type)
-			specificTypeComponentSet.push_back(targetComponetSet[i]);
-	}
-
-	return specificTypeComponentSet;
 }

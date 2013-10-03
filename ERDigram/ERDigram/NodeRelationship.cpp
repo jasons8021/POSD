@@ -10,11 +10,7 @@ NodeRelationship::NodeRelationship( int id, string text ) : Node( id, PARAMETER_
 
 NodeRelationship::~NodeRelationship()
 {
-	_entityCardinalitySet.clear();
-	for(int i = 0; i < getConnections().size(); i++)
-		delete(getConnections()[i]);
-	getConnections().clear();
-
+ 	_entityCardinalitySet.clear();
 }
 
 void NodeRelationship::connectTo( Component* targetNode )

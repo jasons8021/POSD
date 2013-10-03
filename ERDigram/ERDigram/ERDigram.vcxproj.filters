@@ -63,6 +63,9 @@
     <ClInclude Include="ConnectComponentsCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Toolkit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp">
@@ -108,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConnectComponentsCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Toolkit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

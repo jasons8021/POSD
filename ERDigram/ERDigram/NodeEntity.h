@@ -23,9 +23,12 @@ public:
 	virtual ~NodeEntity();
 	void setForeignKey(int);
 	vector<int> getForeignKey();
+	void setPrimaryKey(int);
+	vector<int> getPrimaryKey();
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:
+	vector<int> _primaryKeySet;
 	vector<int> _foreignKeySet;
 };
 

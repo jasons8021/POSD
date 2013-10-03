@@ -196,10 +196,11 @@ void TextUI::setPrimaryKey()
 	cout << TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE;
 	
 	primaryKeys = searchAttribute(entityNodeID);
-	_erModel->setPrimaryKey(primaryKeys);
+	_erModel->setPrimaryKey(atoi(entityNodeID.c_str()), primaryKeys);
 	
+	// The text of pk.
 	for (int i = 0; i < primaryKeys.size(); i++)
-		attributeNodeIDSet += integerToString(primaryKeys[i]) + SPLITERCHAR;
+		attributeNodeIDSet += Toolkit::integerToString(primaryKeys[i]) + SPLITTERBYCOMMA;
 	attributeNodeIDSet = attributeNodeIDSet.substr(0, 2*primaryKeys.size()-1);
 
 	cout << TEXT_NODENUMBEGIN << entityNodeID << TEXT_SETPRIMARYKEY_SETPKFINISH_ONE << attributeNodeIDSet << TEXT_SETPRIMARYKEY_SETPKFINISH_TWO << endl;
@@ -213,7 +214,7 @@ string TextUI::searchEntity( string searchType )
 	while(true){
 		if (!_erModel->searchComponentExist(searchID, PARAMETER_ALL))					// The component is not exist.
 			cout << TEXT_CONNECTION_ERRORNODE;
-		else if (_erModel->searchComponentExist(searchID, PARAMETER_ENTITY))				// Entity is found.
+		else if (_erModel->searchComponentExist(searchID, PARAMETER_ENTITY))			// Entity is found.
 			break;
 		else																			// Component is exist, but its type isn't entity.
 			cout << TEXT_NODENUMBEGIN << searchID << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
@@ -234,19 +235,21 @@ vector<int> TextUI::searchAttribute( string entityNodeID )
 	
 	while(true)
 	{
+		// The errorMessage use to check the pk set(attributeNode) is in the EntityNode.
 		errorMessage = PARAMETER_SPACE;
 		for (int i = 0; i < primaryKeys.size(); i++)
 		{
-			if (!_erModel->searchComponentExist(integerToString(primaryKeys[i]), PARAMETER_ALL))												// The component is not exist.
+			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))												// The component is not exist.
 				errorMessage += TEXT_CONNECTION_ERRORNODE;
 			else if (!_erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		// The component type is not attribute.
-				errorMessage += TEXT_NODENUMBEGIN + integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
+				errorMessage += TEXT_NODENUMBEGIN + Toolkit::integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
 		}
 		if (errorMessage != PARAMETER_SPACE)
 			cout << errorMessage;
-		else
+		else								// The pk set is no problem.
 			break;
 
+		// Restart and initialize.
 		primaryKeys.clear();
 		cin >> attributeNodeID;
 		primaryKeys = splitPrimaryKey(attributeNodeID);
@@ -257,22 +260,16 @@ vector<int> TextUI::searchAttribute( string entityNodeID )
 
 vector<int> TextUI::splitPrimaryKey( string primaryKeys )
 {
-	string::size_type pos;
+	vector<string> splitText;
 	vector<int> primaryKeySet;
 
-	primaryKeys += SPLITERCHAR;
-	int size = primaryKeys.size();
-
-	for (int i = 0; i < size; i++)
+	splitText = Toolkit::splitFunction(primaryKeys,SPLITTERBYCOMMA);
+	
+	for (int i = 0; i < splitText.size(); i++)
 	{
-		pos = primaryKeys.find(SPLITERCHAR,i);
-		if (pos < size)
-		{
-			string tempSubString = primaryKeys.substr(i, pos - i);
-			primaryKeySet.push_back(atoi(tempSubString.c_str()));
-			i = pos;
-		}
+		primaryKeySet.push_back(atoi(splitText[i].c_str()));
 	}
+
 	return primaryKeySet;
 }
 
@@ -306,18 +303,6 @@ void TextUI::displayAttributeTable( int entityID )
 	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
 }
 
-string TextUI::integerToString( int targetNum )
-{
-	stringstream intNum;
-	string intToStringNum;
-
-	// int to string
-	intNum << targetNum; // int to stringstream
-	intNum >> intToStringNum; // stringstream to string
-
-	return intToStringNum;
-}
-
 void TextUI::displayERDiagramTable()
 {
 	if(_erModel->checkOneToOne())
@@ -340,12 +325,14 @@ void TextUI::displayERDiagramTable()
 void TextUI::exitERDiagram()
 {
 	cout << TEXT_GOODBYE;
+	//exit(1);
 }
 
 void TextUI::saveERDiagram()
 {
 	string fileName;
-	cout << "please enter file name";
+	cout << TEXT_SAVE_FILENAME;
 	cin >> fileName;
+
 	_erModel->saveERDiagram(fileName);
 }

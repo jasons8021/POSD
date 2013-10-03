@@ -13,9 +13,6 @@ Component::Component(int id, string type, string text)
 
 Component::~Component()
 {
-	for(int i = 0; i < _connections.size(); i++)
-		delete(_connections[i]);
-	_connections.clear();
 }
 
 int Component::getID()

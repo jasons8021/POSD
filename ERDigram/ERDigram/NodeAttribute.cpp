@@ -14,9 +14,7 @@ NodeAttribute::NodeAttribute( int id, string text ) : Node( id, PARAMETER_ATTRIB
 
 NodeAttribute::~NodeAttribute()
 {
-	for(int i = 0; i < getConnections().size(); i++)
-		delete(getConnections()[i]);
-	getConnections().clear();
+
 }
 
 void NodeAttribute::connectTo( Component* targetNode )

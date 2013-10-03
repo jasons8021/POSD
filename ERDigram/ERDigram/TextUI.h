@@ -52,7 +52,7 @@
 #define TEXT_GOODBYE "Goodbye!"
 
 // Choice 7. Load/Save ERDiagram
-
+#define TEXT_SAVE_FILENAME "Please input the file name: "
 
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
@@ -74,7 +74,7 @@
 #define PARAMETER_CARDINALITYOPTION_TWO "N"
 #define PARAMETER_INITIALSEARCH "initial search"
 
-#define SPLITERCHAR ","
+#define SPLITTERBYCOMMA ","
 
 #include <iostream>
 #include <sstream>
@@ -82,6 +82,7 @@
 #include "ERModel.h"
 #include "Component.h"
 #include "Connector.h"
+#include "Toolkit.h"
 
 using namespace std;
 
@@ -107,7 +108,6 @@ public:
 	void saveERDiagram();
 	string searchComponent(string);
 	string searchEntity(string);
-	string integerToString(int);
 	vector<int> searchAttribute(string);
 	vector<int> splitPrimaryKey(string);
 private:

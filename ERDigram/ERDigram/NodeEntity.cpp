@@ -12,9 +12,6 @@ NodeEntity::NodeEntity( int id, string text ) : Node( id, PARAMETER_ENTITY, text
 NodeEntity::~NodeEntity()
 {
 	_foreignKeySet.clear();
-	for(int i = 0; i < getConnections().size(); i++)
-		delete(getConnections()[i]);
-	getConnections().clear();
 }
 
 void NodeEntity::connectTo( Component* targetNode )
@@ -53,4 +50,22 @@ void NodeEntity::setForeignKey( int foreignKeyOfEntityID )
 vector<int> NodeEntity::getForeignKey()
 {
 	return this->_foreignKeySet;
+}
+
+void NodeEntity::setPrimaryKey( int primaryKeyOfAttributeID )
+{
+	bool checkExist = false;
+	//	Check is existed or not.
+	for (int i = 0; i < _primaryKeySet.size(); i++)
+	{
+		if (_primaryKeySet[i] == primaryKeyOfAttributeID)
+			checkExist = true;
+	}
+	if (!checkExist)
+		_primaryKeySet.push_back(primaryKeyOfAttributeID);
+}
+
+vector<int> NodeEntity::getPrimaryKey()
+{
+	return this->_primaryKeySet;
 }
