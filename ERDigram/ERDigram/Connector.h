@@ -2,7 +2,7 @@
 #define CONNECTOR_H_
 
 #define PARAMETER_CONNECTOR "C"
-#define PARAMETER_SPACE ""
+#define PARAMETER_NULL ""
 
 #include <vector>
 #include "Component.h"

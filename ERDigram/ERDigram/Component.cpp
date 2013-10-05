@@ -13,6 +13,7 @@ Component::Component(int id, string type, string text)
 
 Component::~Component()
 {
+	_connections.clear();
 }
 
 int Component::getID()
@@ -46,7 +47,7 @@ string Component::canConnectTo( Component* targetNode )
 	{
 		if (!(this->searchConnections(targetNode->getID())))
 		{
-			return TEXT_CONNECTION_FINISH;
+			return TEXT_CONNECTION_CANCONNECT;
 		}
 		else
 			return TEXT_NODENUMBEGIN + this->getIDString() + TEXT_CONNECTION_ALREADYCONNECTION + targetNode->getIDString() + TEXT_ENDTEXT;

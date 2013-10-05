@@ -28,7 +28,7 @@ void TextUI::processCommand()
 	switch(atoi(choice.c_str()))
 	{
 	case Load:
-		cout << "Load" << endl;
+		loadERDiagram();
 		displayMenu();
 		break;
 	case Save:
@@ -103,7 +103,7 @@ void TextUI::addConnection()
 	secondComponentID = atoi(searchComponent(PARAMETER_ALL).c_str());
 
 	// if connection is failed, erModel->addConnection() return an error message.
-	if(_erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_FINISH)
+	if(_erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_CANCONNECT)
 	{
 		cout << _erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) << endl;
 		_isDisplayConnectionsTable = false;
@@ -127,7 +127,7 @@ void TextUI::addConnection()
 		_erModel->addConnection(firstComponentID, secondComponentID, cardinalityOption);
 	}
 	else
-		_erModel->addConnection(firstComponentID, secondComponentID, PARAMETER_SPACE);
+		_erModel->addConnection(firstComponentID, secondComponentID, PARAMETER_NULL);
 }
 
 void TextUI::displayComponentTable()
@@ -200,7 +200,7 @@ void TextUI::setPrimaryKey()
 	
 	// The text of pk.
 	for (int i = 0; i < primaryKeys.size(); i++)
-		attributeNodeIDSet += Toolkit::integerToString(primaryKeys[i]) + SPLITTERBYCOMMA;
+		attributeNodeIDSet += Toolkit::integerToString(primaryKeys[i]) + COMMA;
 	attributeNodeIDSet = attributeNodeIDSet.substr(0, 2*primaryKeys.size()-1);
 
 	cout << TEXT_NODENUMBEGIN << entityNodeID << TEXT_SETPRIMARYKEY_SETPKFINISH_ONE << attributeNodeIDSet << TEXT_SETPRIMARYKEY_SETPKFINISH_TWO << endl;
@@ -236,15 +236,15 @@ vector<int> TextUI::searchAttribute( string entityNodeID )
 	while(true)
 	{
 		// The errorMessage use to check the pk set(attributeNode) is in the EntityNode.
-		errorMessage = PARAMETER_SPACE;
+		errorMessage = PARAMETER_NULL;
 		for (int i = 0; i < primaryKeys.size(); i++)
 		{
-			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))												// The component is not exist.
+			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))						// The component is not exist.
 				errorMessage += TEXT_CONNECTION_ERRORNODE;
 			else if (!_erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		// The component type is not attribute.
 				errorMessage += TEXT_NODENUMBEGIN + Toolkit::integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
 		}
-		if (errorMessage != PARAMETER_SPACE)
+		if (errorMessage != PARAMETER_NULL)
 			cout << errorMessage;
 		else								// The pk set is no problem.
 			break;
@@ -263,7 +263,7 @@ vector<int> TextUI::splitPrimaryKey( string primaryKeys )
 	vector<string> splitText;
 	vector<int> primaryKeySet;
 
-	splitText = Toolkit::splitFunction(primaryKeys,SPLITTERBYCOMMA);
+	splitText = Toolkit::splitFunction(primaryKeys,COMMA);
 	
 	for (int i = 0; i < splitText.size(); i++)
 	{
@@ -331,8 +331,17 @@ void TextUI::exitERDiagram()
 void TextUI::saveERDiagram()
 {
 	string fileName;
-	cout << TEXT_SAVE_FILENAME;
+	cout << TEXT_LOADSAVE_FILENAME;
 	cin >> fileName;
 
 	_erModel->saveERDiagram(fileName);
+}
+
+void TextUI::loadERDiagram()
+{
+	string fileName;
+	cout << TEXT_LOADSAVE_FILENAME;
+	cin >> fileName;
+
+	_erModel->loadERDiagram(fileName);
 }

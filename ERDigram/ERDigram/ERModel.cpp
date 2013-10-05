@@ -10,6 +10,7 @@ ERModel::~ERModel()
 	for(int i = 0; i < _components.size(); i++)
 		delete _components[i];
 	_components.clear();
+	_connections.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -21,8 +22,7 @@ void ERModel::addNode( string type, string text )
 	Component* newComponent = static_cast<Component*>(componentFactory->creatComponent(_componentID++, type, text));
 	
 	_components.push_back(newComponent);
-
-	delete(componentFactory);
+	delete componentFactory;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 	Component* newConnection;
 	ComponentFactory* componentFactory = new ComponentFactory();
 
-	if (checkConnectionState(sourceNode, destinationNode) == TEXT_CONNECTION_FINISH)
+	if (checkConnectionState(sourceNode, destinationNode) == TEXT_CONNECTION_CANCONNECT)
 	{
 		newConnection = static_cast<Component*>(componentFactory->creatComponent(_componentID++, PARAMETER_CONNECTOR, text));
 		_components.push_back(newConnection);
@@ -49,7 +49,7 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 		if (checkSetCardinality(sourceNodeID, destinationNodeID))
 			setCardinality(sourceNode, destinationNode, text);
 	}
-	delete(componentFactory);
+	delete componentFactory;
 }
 
 //	Check Connection hasn't any error. If it has, return error message.
@@ -85,12 +85,12 @@ void ERModel::setCardinality( Component* sourceNode, Component* destinationNode,
 {
 	int entityID;
 
-	if (sourceNode->getType() == PARAMETER_ENTITY)
+	if (sourceNode->getType() == PARAMETER_ENTITY)			// sourceNode is entity, and destinationNode is relationship
 	{
 		entityID = sourceNode->getID();
 		static_cast<NodeRelationship*>(destinationNode)->setEntityCardinality(make_pair(entityID,cardinality));
 	}
-	else
+	else													// destinationNode is entity, and sourceNode is relationship
 	{
 		entityID = destinationNode->getID();
 		static_cast<NodeRelationship*>(sourceNode)->setEntityCardinality(make_pair(entityID,cardinality));
@@ -116,7 +116,7 @@ string ERModel::getComponentsTable(string type)
 
 		return componentTableString;
 	}
-	return PARAMETER_SPACE;
+	return PARAMETER_NULL;
 }
 string ERModel::getConnectionTable()
 {
@@ -132,7 +132,7 @@ string ERModel::getConnectionTable()
 		return connectionsTableString;
 	}
 
-	return PARAMETER_SPACE;
+	return PARAMETER_NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -218,12 +218,12 @@ string ERModel::getAttributeContents( vector<Component*> attributeSet)
 	}
 
 	// Delete lastest ", " and set format into string
-	if (isPKString != PARAMETER_SPACE)
+	if (isPKString != PARAMETER_NULL)
 	{
 		isPKString = isPKString.substr(0,isPKString.size()-2);
 		isPKString = TEXT_GETERDIAGRAM_PK + isPKString + TEXT_GETERDIAGRAM_ENDKEY;			
 	}
-	if (isNotPKString != PARAMETER_SPACE)
+	if (isNotPKString != PARAMETER_NULL)
 	{
 		isNotPKString = isNotPKString.substr(0,isNotPKString.size()-2);
 		isNotPKString = TEXT_COMMASPACE + isNotPKString;
@@ -281,8 +281,8 @@ bool ERModel::checkOneToOne()
 {
 	vector<Component*> relationshipNode = searchSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _components);
 
-	// The entityCardinalitySet of Relationship is a set of store relationship between two entities.
-	// The format is (entity, cardinality).
+	// The entityCardinalitySet is a set of relationship between two entities.
+	// The pair format is (entity, cardinality).
 	vector<pair<int,string>> entityCardinalitySet;
 
 	for(int i = 0; i < relationshipNode.size(); i++){
@@ -307,7 +307,7 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 	}
 
 	// Delete lastest ", " and set format into string
-	if (isFKString != PARAMETER_SPACE)
+	if (isFKString != PARAMETER_NULL)
 	{
 		isFKString = isFKString.substr(0,isFKString.size()-2);
 		isFKString = TEXT_GETERDIAGRAM_FK + isFKString + TEXT_GETERDIAGRAM_ENDKEY;
@@ -320,24 +320,140 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 //								Load/Save								//
 //////////////////////////////////////////////////////////////////////////
 
+void ERModel::loadERDiagram( string fileName )
+{
+	ifstream inputERDiagramFile;
+	inputERDiagramFile.open(fileName);
+
+	//	Get all text in file.
+	string erDiagramText((istreambuf_iterator<char>(inputERDiagramFile)),istreambuf_iterator<char>());
+	inputERDiagramFile.close();
+
+	recoveryFile(classifyInputFile(erDiagramText));
+	
+}
+
+vector<vector<string>> ERModel::classifyInputFile( string fileText )
+{
+	vector<string> splitFileText;
+	vector<string> splitComponentsSet;
+	vector<string> splitConnectionsSet;
+	vector<string> splitPrimaryKeysSet;
+	vector<vector<string>> splitResultSet;
+
+	bool firstSpace = false, secondSpace = false;
+
+	splitFileText = Toolkit::splitFunction(fileText,"\n");
+	for(int i = 0; splitFileText.size() > i; i++)
+	{
+		if (splitFileText[i] == "" && !firstSpace)
+			firstSpace = true;
+		else if (splitFileText[i] == "" && firstSpace)
+			secondSpace = true;
+
+		if (splitFileText[i] != "")
+		{
+			if (!firstSpace)
+				splitComponentsSet.push_back(splitFileText[i]);
+			else if(firstSpace && !secondSpace)
+				splitConnectionsSet.push_back(splitFileText[i]);
+			else if (secondSpace)
+				splitPrimaryKeysSet.push_back(splitFileText[i]);
+		}
+	}
+	splitResultSet.push_back(splitComponentsSet);
+	splitResultSet.push_back(splitConnectionsSet);
+	splitResultSet.push_back(splitPrimaryKeysSet);
+
+	return splitResultSet;
+}
+
+//	Rebuild input file setting. FileSet's vector[0] is components set, vector[1] is connections set and vector[2] is primary keys set.
+void ERModel::recoveryFile( vector<vector<string>> fileSet )
+{
+ 	recoveryAllComponent(fileSet[0], fileSet[1]);
+ 	recoveryPrimaryKey(fileSet[2]);
+}
+
+void ERModel::recoveryAllComponent( vector<string> componentsSet, vector<string> connectionsSet )
+{
+	vector<string> componentData;
+	
+	int connectionSetCount = 0;
+	for(int i = 0; i < componentsSet.size(); i++)
+	{
+		componentData = Toolkit::splitFunction(componentsSet[i], TEXT_COMMASPACE);
+
+		if ( componentData[0] == PARAMETER_CONNECTOR && componentData.size() > 1 )			//	Connection with Cardinality
+			connectionSetCount = recoveryConnection(connectionsSet, connectionSetCount, componentData[1]);
+		else if ( componentData[0] == PARAMETER_CONNECTOR )									//	Connection with no Cardinality
+			connectionSetCount = recoveryConnection(connectionsSet, connectionSetCount, PARAMETER_NULL);
+		else																				//	Component of Attribute, Entity and Relationship
+ 			addNode(componentData[0],componentData[1]);
+	}
+}
+
+int ERModel::recoveryConnection( vector<string> connectionsSet, int connectionCount, string connectionText)
+{
+	vector<string> connectionData;
+
+	// splitter.first is componentID (or Entity Node ID)
+	connectionData = splitter(connectionsSet[connectionCount]).second;
+	addConnection(atoi(connectionData[0].c_str()),atoi(connectionData[1].c_str()),connectionText);
+	connectionCount += 1;
+
+	return connectionCount;
+}
+
+void ERModel::recoveryPrimaryKey( vector<string> primaryKeysSet )
+{
+	//	primaryKeysSet is composed by entityNodeID, primarykey set.
+	pair<string,vector<string>> splitPrimaryKey;
+	vector<int> primaryKeyData;
+
+	for (int i = 0; i < primaryKeysSet.size(); i++)
+	{
+		primaryKeyData.clear();
+
+		//	splitter.first is Entity Node ID (or componentID in recoveryConnection function)
+		//	splitter.second is primaryKey set.
+		splitPrimaryKey = splitter(primaryKeysSet[i]);
+		for (int j = 0; j < splitPrimaryKey.second.size(); j++)
+			primaryKeyData.push_back(atoi(splitPrimaryKey.second[j].c_str()));
+
+		setPrimaryKey(atoi(splitPrimaryKey.first.c_str()), primaryKeyData);
+	}
+}
+
+pair<string,vector<string>> ERModel::splitter( string splitRowData )
+{
+	vector<string> splitBySpace;
+	vector<string> splitResult;
+
+	splitBySpace = Toolkit::splitFunction(splitRowData, TEXT_ONESPACE);
+	splitResult = Toolkit::splitFunction(splitBySpace[1], COMMA);
+
+	return make_pair(splitBySpace[0],splitResult);
+}
+
 void ERModel::saveERDiagram( string fileName )
 {
-	ofstream erDiagramFile;
-	erDiagramFile.open(fileName);
+	ofstream outputERDiagramFile;
+	outputERDiagramFile.open(fileName);
 
-	if (!erDiagramFile.is_open())
+	if (!outputERDiagramFile.is_open())
 	{
 		creatFilePath(fileName);
-		erDiagramFile.open(fileName);
+		outputERDiagramFile.open(fileName);
 	}
 
-	erDiagramFile << saveComponentTable();
-	erDiagramFile << TEXT_ENDLINE;
-	erDiagramFile << saveConnectionTable();
-	erDiagramFile << TEXT_ENDLINE;
-	erDiagramFile << savePrimaryKeyTable();
+	outputERDiagramFile << saveComponentTable();
+	outputERDiagramFile << TEXT_ENDLINE;
+	outputERDiagramFile << saveConnectionTable();
+	outputERDiagramFile << TEXT_ENDLINE;
+	outputERDiagramFile << savePrimaryKeyTable();
 
-	erDiagramFile.close();
+	outputERDiagramFile.close();
 }
 
 void ERModel::creatFilePath( string fileName )
@@ -350,7 +466,7 @@ void ERModel::creatFilePath( string fileName )
 	// Final part of splitterFilePath is file name.
 	for (int i = 0; i < (splitterFilePath.size()-1); i++)
 	{
-		if (splitterFilePath[i] != PARAMETER_SPACE)
+		if (splitterFilePath[i] != PARAMETER_NULL)
 			filePath += splitterFilePath[i] + SPLITTERBYBACKSLASH;
 	}
 	_mkdir(filePath.c_str());
@@ -362,7 +478,7 @@ string ERModel::saveComponentTable()
 
 	for (int i = 0; i < _components.size(); i++)
 	{
-		if (_components[i]->getText() == PARAMETER_SPACE)
+		if (_components[i]->getText() == PARAMETER_NULL)
 			componentTableString += _components[i]->getType() + TEXT_ENDLINE;
 		else
 			componentTableString += _components[i]->getType() + TEXT_COMMASPACE + _components[i]->getText() + TEXT_ENDLINE;
@@ -378,7 +494,7 @@ string ERModel::saveConnectionTable()
 	for (int i = 0; i < _connections.size(); i++) 
 	{
 		connectionTableString += Toolkit::integerToString(_connections[i]->getID()) +  TEXT_ONESPACE 
-			+ Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getSourceNodeID()) + TEXT_COMMA
+			+ Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getSourceNodeID()) + COMMA
 			+ Toolkit::integerToString(static_cast<Connector*>(_connections[i])->getDestinationNodeID()) + TEXT_ENDLINE;
 	}
 	return connectionTableString;
@@ -402,13 +518,12 @@ string ERModel::savePrimaryKeyTable()
 				if ( j == pkofEntityNode.size()-1 )		// Final PK
 					primaryKeyTableString += Toolkit::integerToString(pkofEntityNode[j]);
 				else
-					primaryKeyTableString += Toolkit::integerToString(pkofEntityNode[j]) + TEXT_COMMA;
+					primaryKeyTableString += Toolkit::integerToString(pkofEntityNode[j]) + COMMA;
 			}
 		}
 		primaryKeyTableString += TEXT_ENDLINE;
 	}
 	return primaryKeyTableString;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -496,3 +611,5 @@ string ERModel::getComponentDataList( string type, vector<Component*> targetComp
 	}	
 	return ComponentDataList;
 }
+
+

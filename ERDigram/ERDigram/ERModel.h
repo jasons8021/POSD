@@ -1,6 +1,8 @@
 #ifndef ERMODEL_H_
 #define ERMODEL_H_
 
+#define TEXT_CONNECTION_CANCONNECT "CANCONNECT"
+
 #define TEXT_GETERDIAGRAM_ENDKEY ")"
 #define TEXT_GETERDIAGRAM_PK "PK("
 #define TEXT_GETERDIAGRAM_FK ", FK("
@@ -12,9 +14,9 @@
 #define TEXT_LINESPACE "|  "
 #define TEXT_COMMASPACE ", "
 #define TEXT_ENDLINE "\n"
-#define TEXT_COMMA ","
+#define COMMA ","
 
-#define PARAMETER_SPACE ""
+#define PARAMETER_NULL ""
 #define PARAMETER_ATTRIBUTE "A"
 #define PARAMETER_ENTITY "E"
 #define PARAMETER_RELATIONSHIP "R"
@@ -22,7 +24,6 @@
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_RELATIONSHIPLOWERBOUND 2
 
-#define SPLITTERBYCOMMA ","
 #define SPLITTERBYBACKSLASH "\\"
 
 #include <iostream>
@@ -42,13 +43,18 @@ class ERModel
 public:
 	ERModel();
 	virtual ~ERModel();
+	int recoveryConnection(vector<string>, int, string);
 	void addNode(string, string);
 	void addConnection(int, int, string);
 	void setCardinality(Component*, Component*, string);
 	void setPrimaryKey(int, vector<int>);
 	void setForeignKey();
+	void loadERDiagram(string);
 	void saveERDiagram(string);
 	void creatFilePath(string);
+	void recoveryFile(vector<vector<string>>);
+	void recoveryAllComponent(vector<string>, vector<string>);
+	void recoveryPrimaryKey(vector<string>);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
@@ -72,6 +78,8 @@ public:
 	Component* searchComponent(int);
 	vector<int> oneToOne(NodeRelationship*);
 	vector<Component*> searchSpecificTypeComponentSet(string, vector<Component*>);
+	vector<vector<string>> classifyInputFile(string);
+	pair<string,vector<string>> splitter(string);
 private:
 	int _componentID;
 	vector<Component*> _components;

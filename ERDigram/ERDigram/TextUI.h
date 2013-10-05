@@ -28,7 +28,7 @@
 #define TEXT_CONNECTION_CARDINALITY "Enter the type of the cardinality:"
 #define TEXT_CONNECTION_CARDINALITYOPTION "[0]1 [1]N\n> "
 #define TEXT_CONNECTION_CARDINALITYRELATIONSHIP "Its cardinality of the relationship is '"
-#define TEXT_CONNECTION_FINISH "CONNECTOK"
+#define TEXT_CONNECTION_CANCONNECT "CANCONNECT"
 #define TEXT_CONNECTION_TITLE "Connections:"
 
 // Choice 4. SetPrimaryKey text set
@@ -52,7 +52,7 @@
 #define TEXT_GOODBYE "Goodbye!"
 
 // Choice 7. Load/Save ERDiagram
-#define TEXT_SAVE_FILENAME "Please input the file name: "
+#define TEXT_LOADSAVE_FILENAME "Please input the file name: "
 
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
@@ -74,7 +74,7 @@
 #define PARAMETER_CARDINALITYOPTION_TWO "N"
 #define PARAMETER_INITIALSEARCH "initial search"
 
-#define SPLITTERBYCOMMA ","
+#define COMMA ","
 
 #include <iostream>
 #include <sstream>
@@ -86,7 +86,7 @@
 
 using namespace std;
 
-enum Option{Add=1, Connect, GetTable, SetPK, GetERTable, Delete, Undo, Redo, Exit,Load, Save};
+enum Option{Load = 1, Save, Add, Connect, GetTable, SetPK, GetERTable, Delete, Undo, Redo, Exit};
 enum Cardinality{CardinalityOptionOne, CardinalityOptionTwo};
 
 class TextUI
@@ -105,6 +105,7 @@ public:
 	void displayERDiagramTable();
 	void processCommand();
 	void exitERDiagram();
+	void loadERDiagram();
 	void saveERDiagram();
 	string searchComponent(string);
 	string searchEntity(string);

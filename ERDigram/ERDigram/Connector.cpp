@@ -20,7 +20,7 @@ void Connector::connectTo( Component* )
 
 string Connector::canConnectTo( Component* )
 {
-	return PARAMETER_SPACE;
+	return PARAMETER_NULL;
 }
 
 void Connector::setSourceNode( Component* sourceNode )

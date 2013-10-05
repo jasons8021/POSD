@@ -12,6 +12,7 @@ NodeEntity::NodeEntity( int id, string text ) : Node( id, PARAMETER_ENTITY, text
 NodeEntity::~NodeEntity()
 {
 	_foreignKeySet.clear();
+	_primaryKeySet.clear();
 }
 
 void NodeEntity::connectTo( Component* targetNode )
@@ -25,8 +26,8 @@ string NodeEntity::canConnectTo( Component* targetNode )
 
 	if (targetNode->getType() == PARAMETER_RELATIONSHIP || targetNode->getType() == PARAMETER_ATTRIBUTE)
 	{
-		if (checkMessage == TEXT_CONNECTION_FINISH)		// TargetNode can be connected.
-			return TEXT_CONNECTION_FINISH;
+		if (checkMessage == TEXT_CONNECTION_CANCONNECT)		// TargetNode can be connected.
+			return TEXT_CONNECTION_CANCONNECT;
 		else											// Already connected or connected itself
 			return checkMessage;
 	}

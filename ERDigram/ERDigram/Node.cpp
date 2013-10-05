@@ -20,5 +20,5 @@ void Node::connectTo( Component* TargetNode )
 string Node::canConnectTo( Component* TargetNode )
 {
 	// The method is implemeneted by derived class.
-	return PARAMETER_SPACE;
+	return PARAMETER_NULL;
 }

@@ -6,7 +6,7 @@
 #define TEXT_CONNECTION_ITSELFCONNECTION "' cannot be connected to itself."
 #define TEXT_CONNECTION_ALREADYCONNECTION "' has already been connected to component '"
 #define TEXT_ENDTEXT "'."
-#define TEXT_CONNECTION_FINISH "CONNECTOK"
+#define TEXT_CONNECTION_CANCONNECT "CANCONNECT"
 
 #define PARAMETER_ATTRIBUTE "A"
 #define PARAMETER_ENTITY "E"

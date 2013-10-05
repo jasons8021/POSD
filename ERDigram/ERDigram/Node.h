@@ -1,7 +1,7 @@
 #ifndef NODE_H_
 #define NODE_H_
 
-#define PARAMETER_SPACE ""
+#define PARAMETER_NULL ""
 
 #include <vector>
 #include "Component.h"
