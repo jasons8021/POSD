@@ -58,6 +58,12 @@ void TextUI::processCommand()
 		displayERDiagramTable();
 		displayMenu();
 		break;
+	case Delete:
+		deleteComponent();
+		displayComponentTable();
+		displayConnectionTable();
+		displayMenu();
+		break;
 	case Exit:
 		exitERDiagram();
 		break;
@@ -166,20 +172,6 @@ void TextUI::displayConnectionTable()
 	}
 }
 
-string TextUI::searchComponent( string searchType )
-{
-	string searchID;
-
-	cin >> searchID;
-	while(!(_erModel->searchComponentExist(searchID, searchType))){
-		if (searchType == PARAMETER_ALL)
-			cout << TEXT_CONNECTION_ERRORNODE;
-		cin >> searchID;
-	}
-	return searchID;
-}
-
-
 void TextUI::setPrimaryKey()
 {
 	string entityNodeID;
@@ -204,58 +196,6 @@ void TextUI::setPrimaryKey()
 	attributeNodeIDSet = attributeNodeIDSet.substr(0, 2*primaryKeys.size()-1);
 
 	cout << TEXT_NODENUMBEGIN << entityNodeID << TEXT_SETPRIMARYKEY_SETPKFINISH_ONE << attributeNodeIDSet << TEXT_SETPRIMARYKEY_SETPKFINISH_TWO << endl;
-}
-
-string TextUI::searchEntity( string searchType )
-{
-	string searchID;
-
-	cin >> searchID;
-	while(true){
-		if (!_erModel->searchComponentExist(searchID, PARAMETER_ALL))					// The component is not exist.
-			cout << TEXT_CONNECTION_ERRORNODE;
-		else if (_erModel->searchComponentExist(searchID, PARAMETER_ENTITY))			// Entity is found.
-			break;
-		else																			// Component is exist, but its type isn't entity.
-			cout << TEXT_NODENUMBEGIN << searchID << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
-		cin >> searchID;
-	}
-	return searchID;
-}
-
-vector<int> TextUI::searchAttribute( string entityNodeID )
-{
-	string attributeNodeID;
-	string errorMessage = PARAMETER_INITIALSEARCH;
-	vector<int> primaryKeys;
-
-	cin >> attributeNodeID;
-	primaryKeys = splitPrimaryKey(attributeNodeID);
-
-	
-	while(true)
-	{
-		// The errorMessage use to check the pk set(attributeNode) is in the EntityNode.
-		errorMessage = PARAMETER_NULL;
-		for (int i = 0; i < primaryKeys.size(); i++)
-		{
-			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))						// The component is not exist.
-				errorMessage += TEXT_CONNECTION_ERRORNODE;
-			else if (!_erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		// The component type is not attribute.
-				errorMessage += TEXT_NODENUMBEGIN + Toolkit::integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
-		}
-		if (errorMessage != PARAMETER_NULL)
-			cout << errorMessage;
-		else								// The pk set is no problem.
-			break;
-
-		// Restart and initialize.
-		primaryKeys.clear();
-		cin >> attributeNodeID;
-		primaryKeys = splitPrimaryKey(attributeNodeID);
-	}
-	
-	return primaryKeys;
 }
 
 vector<int> TextUI::splitPrimaryKey( string primaryKeys )
@@ -325,7 +265,6 @@ void TextUI::displayERDiagramTable()
 void TextUI::exitERDiagram()
 {
 	cout << TEXT_GOODBYE;
-	//exit(1);
 }
 
 void TextUI::saveERDiagram()
@@ -344,4 +283,81 @@ void TextUI::loadERDiagram()
 	cin >> fileName;
 
 	_erModel->loadERDiagram(fileName);
+}
+
+void TextUI::deleteComponent()
+{
+	string delComponentID;
+	cout << TEXT_DELETE_ENTERNODE;
+	delComponentID = searchComponent(PARAMETER_ALL);
+	_erModel->deleteFunction(atoi(delComponentID.c_str()));
+	
+	cout << TEXT_DELETE_DELETEFINISH_ONE << delComponentID << TEXT_DELETE_DELETEFINISH_TWO;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//					檢查輸入的節點ID是否正確的Function					//
+//////////////////////////////////////////////////////////////////////////
+
+string TextUI::searchComponent( string searchType )
+{
+	string searchID;
+
+	cin >> searchID;
+	while(!(_erModel->searchComponentExist(searchID, searchType))){
+		if (searchType == PARAMETER_ALL)
+			cout << TEXT_CONNECTION_ERRORNODE;
+		cin >> searchID;
+	}
+	return searchID;
+}
+
+string TextUI::searchEntity( string searchType )
+{
+	string searchID;
+
+	cin >> searchID;
+	while(true){
+		if (!_erModel->searchComponentExist(searchID, PARAMETER_ALL))					// 輸入ID不存在
+			cout << TEXT_CONNECTION_ERRORNODE;
+		else if (_erModel->searchComponentExist(searchID, PARAMETER_ENTITY))			// 找到輸入的Entity
+			break;
+		else																			// 輸入的ID不是Entity
+			cout << TEXT_NODENUMBEGIN << searchID << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
+		cin >> searchID;
+	}
+	return searchID;
+}
+
+vector<int> TextUI::searchAttribute( string entityNodeID )
+{
+	string attributeNodeID;
+	string errorMessage = PARAMETER_INITIALSEARCH;
+	vector<int> primaryKeys;
+	cin >> attributeNodeID;
+	primaryKeys = splitPrimaryKey(attributeNodeID);
+
+	while(true)
+	{
+		//	errorMessage用來回報Primary Key的集合是否有問題
+		errorMessage = PARAMETER_NULL;
+		for (int i = 0; i < primaryKeys.size(); i++)
+		{
+			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))						//	輸入的ID不存在.
+				errorMessage += TEXT_CONNECTION_ERRORNODE;
+			else if (!_erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		//	輸入的ID並非在該EntityNode中
+				errorMessage += TEXT_NODENUMBEGIN + Toolkit::integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
+		}
+		if (errorMessage != PARAMETER_NULL)
+			cout << errorMessage;
+		else								//	輸入的Primary Key的集合正確，跳出回傳結果
+			break;
+
+		//	重新輸入新的Primary Key
+		primaryKeys.clear();
+		cin >> attributeNodeID;
+		primaryKeys = splitPrimaryKey(attributeNodeID);
+	}
+
+	return primaryKeys;
 }

@@ -14,7 +14,7 @@ ERModel::~ERModel()
 }
 
 //////////////////////////////////////////////////////////////////////////
-//								AddNode									//
+//							AddNode										//
 //////////////////////////////////////////////////////////////////////////
 void ERModel::addNode( string type, string text )
 {
@@ -99,7 +99,7 @@ void ERModel::setCardinality( Component* sourceNode, Component* destinationNode,
 
 
 //////////////////////////////////////////////////////////////////////////
-//								GetTable								//
+//							GetTable									//
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -317,7 +317,7 @@ string ERModel::searchForeignKey( int foreignKeyEntityID )
 }
 
 //////////////////////////////////////////////////////////////////////////
-//								Load/Save								//
+//							Load/Save									//
 //////////////////////////////////////////////////////////////////////////
 
 void ERModel::loadERDiagram( string fileName )
@@ -527,6 +527,85 @@ string ERModel::savePrimaryKeyTable()
 }
 
 //////////////////////////////////////////////////////////////////////////
+//							Delete Node									//
+//////////////////////////////////////////////////////////////////////////
+
+void ERModel::deleteFunction( int componentID )
+{
+	Component* delComponent = searchComponent(componentID);
+	
+	if (delComponent->getType() != PARAMETER_CONNECTOR)
+	{
+		deleteComponent(delComponent);
+	}
+	else
+	{
+		deleteConnection(delComponent);
+	}
+}
+
+void ERModel::deleteComponent( Component* delComponent )
+{
+	//	與要刪除的Component有關連的Component
+	vector<Component*> relatedComponents = searchRelatedComponent(delComponent->getID());
+	//	與要刪除的Component有關連的Connector ID
+	vector<Component*> relatedConnections = searchConnection(delComponent->getID());
+	int relatedConnectionsEndIndex = relatedConnections.size() - 1;
+	int delID;
+
+	//	走訪每個有關連的Component
+	for (int i = 0; i < relatedComponents.size(); i++)
+		relatedComponents[i]->deleteConnectedComponent(delComponent->getID());
+	
+	//	刪除Components中的Connector
+	while(relatedConnections.size() > 0)
+	{
+		delID = relatedConnections[relatedConnectionsEndIndex]->getID();
+		deleteTableSet(delID, _components, PARAMETER_COMPONENTSTABLE);
+		deleteTableSet(delID, _connections, PARAMETER_CONNECTIONSTABLE);
+
+		relatedConnections.pop_back();
+		relatedConnectionsEndIndex = relatedConnections.size() - 1;
+	}
+	deleteTableSet(delComponent->getID(), _components, PARAMETER_COMPONENTSTABLE);
+}
+
+void ERModel::deleteConnection( Component* delComponent )
+{
+	Connector* delConnector = static_cast<Connector*>(delComponent);
+	Component* sourceNode = searchComponent(delConnector->getSourceNodeID());
+	Component* destinationNode = searchComponent(delConnector->getDestinationNodeID());
+
+	sourceNode->deleteConnectedComponent(delConnector->getDestinationNodeID());
+	destinationNode->deleteConnectedComponent(delConnector->getSourceNodeID());
+
+	deleteTableSet(delComponent->getID(), _components, PARAMETER_COMPONENTSTABLE);
+	deleteTableSet(delComponent->getID(), _connections, PARAMETER_CONNECTIONSTABLE);
+}
+
+void ERModel::deleteTableSet( int delID, vector<Component*> targetTableSet, int tableType )
+{
+	for(int i = 0; i < targetTableSet.size(); i++)
+	{
+		if (delID == targetTableSet[i]->getID())
+		{
+			switch(tableType){
+			case PARAMETER_COMPONENTSTABLE:
+				_components.erase(_components.begin()+i);
+				break;
+			case PARAMETER_CONNECTIONSTABLE:
+				_connections.erase(_connections.begin()+i);
+				break;
+			default:
+				break;
+			}
+			break;
+		}
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 //							General Function							//
 //////////////////////////////////////////////////////////////////////////
 
@@ -610,6 +689,36 @@ string ERModel::getComponentDataList( string type, vector<Component*> targetComp
 		}
 	}	
 	return ComponentDataList;
+}
+
+//	尋找與ComponentID有關連的Connection
+vector<Component*> ERModel::searchConnection( int searchID )
+{
+	vector<Component*> resultSet;
+
+	for (int i = 0; i < _connections.size(); i++)
+	{
+		if (static_cast<Connector*>(_connections[i])->getSourceNodeID() == searchID ||
+			static_cast<Connector*>(_connections[i])->getDestinationNodeID() == searchID)
+			resultSet.push_back(_connections[i]);
+	}
+
+	return resultSet;
+}
+
+vector<Component*> ERModel::searchRelatedComponent( int searchID )
+{
+	vector<Component*> resultSet;
+
+	for (int i = 0; i < _connections.size(); i++)
+	{
+		if (static_cast<Connector*>(_connections[i])->getSourceNodeID() == searchID)
+			resultSet.push_back(searchComponent(static_cast<Connector*>(_connections[i])->getDestinationNodeID()));
+		else if(static_cast<Connector*>(_connections[i])->getDestinationNodeID() == searchID)
+			resultSet.push_back(searchComponent(static_cast<Connector*>(_connections[i])->getSourceNodeID()));
+	}
+
+	return resultSet;
 }
 
 

@@ -90,3 +90,12 @@ vector<Component*> Component::getConnections()
 	return this->_connections;
 }
 
+void Component::deleteConnectedComponent( int delComponentID )
+{
+	for (int i = 0; i < _connections.size(); i++)
+	{
+		if (_connections[i]->getID() == delComponentID)
+			_connections.erase(_connections.begin()+i);
+	}
+}
+

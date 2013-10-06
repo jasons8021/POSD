@@ -2,7 +2,7 @@
 #define TEXTUI_H_
 
 // Menu text set.
-#define TEXT_MENU "1. Load ER diagram file\n2. Save ER diagram file\n3. Add a node\n4. Connect two nodes\n5. Display the current diagram\n6. Set a primary key\n7. Display the table\n8. Delete a component\n9. Undo\n10.Redo\n11. Exit\n> "
+#define TEXT_MENU "1.  Load ER diagram file\n2.  Save ER diagram file\n3.  Add a node\n4.  Connect two nodes\n5.  Display the current diagram\n6.  Set a primary key\n7.  Display the table\n8.  Delete a component\n9.  Undo\n10. Redo\n11. Exit\n> "
 #define TEXT_MENU_ERRORCHOICE "You entered a invalid number. Please enter a valid number again.\n> "
 
 // General text set
@@ -53,6 +53,11 @@
 
 // Choice 7. Load/Save ERDiagram
 #define TEXT_LOADSAVE_FILENAME "Please input the file name: "
+
+// Choice 8. Delete
+#define TEXT_DELETE_ENTERNODE "Please enter the component ID\n> "
+#define TEXT_DELETE_DELETEFINISH_ONE "The component '"
+#define TEXT_DELETE_DELETEFINISH_TWO "' has been deleted."
 
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
@@ -107,6 +112,7 @@ public:
 	void exitERDiagram();
 	void loadERDiagram();
 	void saveERDiagram();
+	void deleteComponent();
 	string searchComponent(string);
 	string searchEntity(string);
 	vector<int> searchAttribute(string);

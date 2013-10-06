@@ -23,6 +23,8 @@
 #define PARAMETER_CONNECTOR "C"
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_RELATIONSHIPLOWERBOUND 2
+#define PARAMETER_COMPONENTSTABLE 0
+#define PARAMETER_CONNECTIONSTABLE 1
 
 #define SPLITTERBYBACKSLASH "\\"
 
@@ -55,6 +57,10 @@ public:
 	void recoveryFile(vector<vector<string>>);
 	void recoveryAllComponent(vector<string>, vector<string>);
 	void recoveryPrimaryKey(vector<string>);
+	void deleteFunction(int);
+	void deleteComponent(Component*);
+	void deleteTableSet(int, vector<Component*>, int);
+	void deleteConnection(Component*);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
@@ -78,6 +84,8 @@ public:
 	Component* searchComponent(int);
 	vector<int> oneToOne(NodeRelationship*);
 	vector<Component*> searchSpecificTypeComponentSet(string, vector<Component*>);
+	vector<Component*> searchConnection(int);
+	vector<Component*> searchRelatedComponent(int);
 	vector<vector<string>> classifyInputFile(string);
 	pair<string,vector<string>> splitter(string);
 private:
