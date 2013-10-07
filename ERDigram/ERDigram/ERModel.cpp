@@ -16,13 +16,23 @@ ERModel::~ERModel()
 //////////////////////////////////////////////////////////////////////////
 //							AddNode										//
 //////////////////////////////////////////////////////////////////////////
-void ERModel::addNode( string type, string text )
+
+//	componentID遞增的情況下使用
+int ERModel::addNode( string type, string text )
+{
+	return addNode(_componentID++, type, text);
+}
+
+//	指定componentID的情況使用，eg:undo、redo，並回傳componentID
+int ERModel::addNode( int componentID, string type, string text )
 {
 	ComponentFactory* componentFactory = new ComponentFactory();
-	Component* newComponent = static_cast<Component*>(componentFactory->creatComponent(_componentID++, type, text));
-	
+	Component* newComponent = static_cast<Component*>(componentFactory->creatComponent(componentID, type, text));
+
 	_components.push_back(newComponent);
 	delete componentFactory;
+
+	return newComponent->getID();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -343,15 +353,15 @@ vector<vector<string>> ERModel::classifyInputFile( string fileText )
 
 	bool firstSpace = false, secondSpace = false;
 
-	splitFileText = Toolkit::splitFunction(fileText,"\n");
+	splitFileText = Toolkit::splitFunction(fileText,TEXT_ENDLINE);
 	for(int i = 0; splitFileText.size() > i; i++)
 	{
-		if (splitFileText[i] == "" && !firstSpace)
+		if (splitFileText[i] == PARAMETER_NULL && !firstSpace)
 			firstSpace = true;
-		else if (splitFileText[i] == "" && firstSpace)
+		else if (splitFileText[i] == PARAMETER_NULL && firstSpace)
 			secondSpace = true;
 
-		if (splitFileText[i] != "")
+		if (splitFileText[i] != PARAMETER_NULL)
 		{
 			if (!firstSpace)
 				splitComponentsSet.push_back(splitFileText[i]);
@@ -535,13 +545,9 @@ void ERModel::deleteFunction( int componentID )
 	Component* delComponent = searchComponent(componentID);
 	
 	if (delComponent->getType() != PARAMETER_CONNECTOR)
-	{
 		deleteComponent(delComponent);
-	}
 	else
-	{
 		deleteConnection(delComponent);
-	}
 }
 
 void ERModel::deleteComponent( Component* delComponent )
@@ -604,6 +610,24 @@ void ERModel::deleteTableSet( int delID, vector<Component*> targetTableSet, int 
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+//							Command Pattern								//
+//////////////////////////////////////////////////////////////////////////
+
+void ERModel::addNodeCmd( string type, string text )
+{
+	_cmdManager.execute(new AddComponentCmd(this, type, text));
+}
+
+void ERModel::undoCmd()
+{
+	_cmdManager.undo();
+}
+
+void ERModel::redoCmd()
+{
+	_cmdManager.redo();
+}
 
 //////////////////////////////////////////////////////////////////////////
 //							General Function							//
@@ -719,6 +743,26 @@ vector<Component*> ERModel::searchRelatedComponent( int searchID )
 	}
 
 	return resultSet;
+}
+
+int ERModel::getComponentTableSize()
+{
+	return _components.size();
+}
+
+int ERModel::getConnectionTableSize()
+{
+	return _connections.size();
+}
+
+void ERModel::setComponentID( int componentID )
+{
+	_componentID = componentID;
+}
+
+int ERModel::getComponentID()
+{
+	return _componentID;
 }
 
 

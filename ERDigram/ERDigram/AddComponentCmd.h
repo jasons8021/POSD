@@ -1,24 +1,26 @@
-/*
- * AddCommand.h
- *
- *  Created on: 2009/11/29
- *      Author: zwshen
- */
-
 #ifndef ADDCOMPONENTCMD_H_
 #define ADDCOMPONENTCMD_H_
 
+#define PARAMETER_NOVALUE -1
+#define PARAMETER_PRECOMPONENTID -1
+#define PARAMETER_NEXTCOMPONENTID 1
+
 #include "Command.h"
+#include "ERModel.h"
+
+class ERModel;
 
 class AddComponentCmd : public Command {
 public:
-	AddComponentCmd(/*Model* m, Shape::ShapeType type*/);
+	AddComponentCmd(ERModel* erModel, string, string);
 	virtual ~AddComponentCmd();
 	void execute();
 	void unexecute();
-// private:
-// 	Model* model;
-// 	Shape::ShapeType m_type;
+private:
+	ERModel* _erModel;
+	int _componentID;
+	string _type;
+	string _text;
 
 };
 

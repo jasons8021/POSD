@@ -113,6 +113,8 @@ public:
 	void loadERDiagram();
 	void saveERDiagram();
 	void deleteComponent();
+	void undoCmd();
+	void redoCmd();
 	string searchComponent(string);
 	string searchEntity(string);
 	vector<int> searchAttribute(string);

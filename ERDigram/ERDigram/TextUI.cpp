@@ -3,8 +3,6 @@
 TextUI::TextUI(ERModel* erModel)
 {
 	this->_erModel = erModel;
-	_isDisplayComponentsTable = true;
-	_isDisplayConnectionsTable = true;
 }
 
 TextUI::~TextUI()
@@ -15,8 +13,6 @@ TextUI::~TextUI()
 void TextUI::displayMenu()
 {
 	cout << TEXT_MENU;
-	_isDisplayComponentsTable = true;
-	_isDisplayConnectionsTable = true;
 	processCommand();
 }
 
@@ -64,6 +60,14 @@ void TextUI::processCommand()
 		displayConnectionTable();
 		displayMenu();
 		break;
+	case Undo:
+		undoCmd();
+		displayMenu();
+		break;
+	case Redo:
+		redoCmd();
+		displayMenu();
+		break;
 	case Exit:
 		exitERDiagram();
 		break;
@@ -91,7 +95,7 @@ void TextUI::addNewNode()
 	cout << TEXT_ADDNEWNODE_NAME;
 	cin >> text;
 
-	_erModel->addNode(type,text);
+	_erModel->addNodeCmd(type,text);
 }
 
 void TextUI::addConnection()
@@ -110,10 +114,7 @@ void TextUI::addConnection()
 
 	// if connection is failed, erModel->addConnection() return an error message.
 	if(_erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_CANCONNECT)
-	{
 		cout << _erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) << endl;
-		_isDisplayConnectionsTable = false;
-	}
 	else if(_erModel->checkSetCardinality(firstComponentID, secondComponentID))
 	{
 		cout << TEXT_CONNECTION_CARDINALITY << endl;
@@ -138,7 +139,7 @@ void TextUI::addConnection()
 
 void TextUI::displayComponentTable()
 {
-	if (_isDisplayComponentsTable)
+	if (_erModel->getComponentTableSize() > 0)
 	{
 		// ComponentTable format
 		cout << TEXT_ADDNEWNODE_TITLE << endl;
@@ -156,7 +157,7 @@ void TextUI::displayComponentTable()
 
 void TextUI::displayConnectionTable()
 {
-	if (_isDisplayConnectionsTable)
+	if (_erModel->getConnectionTableSize() > 0)
 	{
 		// ConnectiontTable format
 		cout << TEXT_CONNECTION_TITLE << endl;
@@ -292,7 +293,17 @@ void TextUI::deleteComponent()
 	delComponentID = searchComponent(PARAMETER_ALL);
 	_erModel->deleteFunction(atoi(delComponentID.c_str()));
 	
-	cout << TEXT_DELETE_DELETEFINISH_ONE << delComponentID << TEXT_DELETE_DELETEFINISH_TWO;
+	cout << TEXT_DELETE_DELETEFINISH_ONE << delComponentID << TEXT_DELETE_DELETEFINISH_TWO << endl;
+}
+
+void TextUI::undoCmd()
+{
+	_erModel->undoCmd();
+}
+
+void TextUI::redoCmd()
+{
+	_erModel->redoCmd();
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,16 +1,11 @@
-/*
- * History.cpp
- *
- *  Created on: 2009/11/29
- *      Author: zwshen
- */
-
 #include "CommandManager.h"
 
-CommandManager::CommandManager() {
+CommandManager::CommandManager()
+{
 }
 
-CommandManager::~CommandManager() {
+CommandManager::~CommandManager()
+{
 	while (!_undoCmds.empty()) {
 		Command* c = _undoCmds.top();
 		_undoCmds.pop();
@@ -23,7 +18,8 @@ CommandManager::~CommandManager() {
 	}
 }
 
-void CommandManager::execute(Command* cmd) {
+void CommandManager::execute(Command* cmd)
+{
 	cmd->execute();
 	_undoCmds.push(cmd);
 
@@ -35,7 +31,8 @@ void CommandManager::execute(Command* cmd) {
 	}
 }
 
-void CommandManager::redo() {
+void CommandManager::redo()
+{
 	if (_redoCmds.size() == 0)
 		return; // or throw exception
 
@@ -45,7 +42,8 @@ void CommandManager::redo() {
 	_undoCmds.push(c);
 }
 
-void CommandManager::undo() {
+void CommandManager::undo()
+{
 	if (_undoCmds.size() == 0)
 		return;
 

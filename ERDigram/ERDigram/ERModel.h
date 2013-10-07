@@ -34,19 +34,27 @@
 #include <sstream>
 #include <vector>
 #include <direct.h>
+#include "AddComponentCmd.h"
 #include "Component.h"
 #include "ComponentFactory.h"
+#include "CommandManager.h"
 #include "Toolkit.h"
 
 using namespace std;
+
+class AddComponentCmd;
 
 class ERModel
 {
 public:
 	ERModel();
 	virtual ~ERModel();
+	int addNode(string, string);
+	int addNode(int, string, string);
 	int recoveryConnection(vector<string>, int, string);
-	void addNode(string, string);
+	int getComponentTableSize();
+	int getConnectionTableSize();
+	int getComponentID();
 	void addConnection(int, int, string);
 	void setCardinality(Component*, Component*, string);
 	void setPrimaryKey(int, vector<int>);
@@ -61,6 +69,10 @@ public:
 	void deleteComponent(Component*);
 	void deleteTableSet(int, vector<Component*>, int);
 	void deleteConnection(Component*);
+	void addNodeCmd(string, string);
+	void undoCmd();
+	void redoCmd();
+	void setComponentID(int);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);
 	bool connectedTypeCheck(Component*, Component*);
@@ -90,6 +102,7 @@ public:
 	pair<string,vector<string>> splitter(string);
 private:
 	int _componentID;
+	CommandManager _cmdManager;
 	vector<Component*> _components;
 	vector<Component*> _connections;
 };

@@ -2,6 +2,7 @@
 #define DELETECOMPONENTCMD_H_
 
 #include "command.h"
+#include "ERModel.h"
 
 class DeleteComponentCmd : public Command
 {
@@ -10,6 +11,8 @@ public:
 	~DeleteComponentCmd();
 	void execute();
 	void unexecute();
+private:
+	ERModel* _erModel;
 };
 
 #endif
