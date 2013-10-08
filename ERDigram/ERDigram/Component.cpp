@@ -46,9 +46,7 @@ string Component::canConnectTo( Component* targetNode )
 	if (this->getID() != targetNode->getID())
 	{
 		if (!(this->searchConnections(targetNode->getID())))
-		{
 			return TEXT_CONNECTION_CANCONNECT;
-		}
 		else
 			return TEXT_NODENUMBEGIN + this->getIDString() + TEXT_CONNECTION_ALREADYCONNECTION + targetNode->getIDString() + TEXT_ENDTEXT;
 	}
@@ -60,11 +58,11 @@ bool Component::searchConnections( int searchID )
 {
 	for( int i = 0; i < _connections.size(); i++)
 	{
-		// find!
+		//	已經有connect了
 		if (_connections[i]->getID() == searchID)
 			return true;
 	}
-	// Not find!
+	//	還沒connect
 	return false;
 }
 

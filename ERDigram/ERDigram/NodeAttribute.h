@@ -25,6 +25,7 @@ public:
 	virtual ~NodeAttribute();
 	bool getIsPrimaryKey();
 	void setIsPrimaryKey(bool);
+	virtual void deleteConnectedComponent(int);
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:

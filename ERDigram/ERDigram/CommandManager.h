@@ -18,8 +18,8 @@ public:
 	CommandManager();
 	virtual ~CommandManager();
 	void execute(Command* c);
-	void redo();
-	void undo();
+	bool redo();
+	bool undo();
 private:
 	stack<Command*> _undoCmds;
 	stack<Command*> _redoCmds;

@@ -14,6 +14,7 @@
 
 #include <vector>
 #include "Node.h"
+#include "Toolkit.h"
 
 using namespace std;
 
@@ -24,7 +25,9 @@ public:
 	NodeRelationship(int, string);
 	virtual ~NodeRelationship();
 	void setEntityCardinality(pair<int, string>);
+	void deleteEntityCardinality(int);
 	vector<pair<int, string>> getEntityCardinality();
+	virtual void deleteConnectedComponent(int);
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:

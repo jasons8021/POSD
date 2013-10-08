@@ -33,12 +33,10 @@ void TextUI::processCommand()
 		break;
 	case Add:
 		addNewNode();
-		displayComponentTable();
 		displayMenu();
 		break;
 	case Connect:
 		addConnection();
-		displayConnectionTable();
 		displayMenu();
 		break;
 	case GetTable:
@@ -56,8 +54,6 @@ void TextUI::processCommand()
 		break;
 	case Delete:
 		deleteComponent();
-		displayComponentTable();
-		displayConnectionTable();
 		displayMenu();
 		break;
 	case Undo:
@@ -96,13 +92,14 @@ void TextUI::addNewNode()
 	cin >> text;
 
 	_erModel->addNodeCmd(type,text);
+
+	displayComponentTable();
 }
 
 void TextUI::addConnection()
 {
 	int firstComponentID;
 	int secondComponentID;
-	string cardinalityOption;
 
 	// First Node
 	cout << TEXT_CONNECTION_FIRSTNODE;
@@ -112,31 +109,36 @@ void TextUI::addConnection()
 	cout << TEXT_CONNECTION_SECONDNODE;
 	secondComponentID = atoi(searchComponent(PARAMETER_ALL).c_str());
 
-	// if connection is failed, erModel->addConnection() return an error message.
+	// 如果要connection的兩個Component有問題，則回傳問題字串
 	if(_erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_CANCONNECT)
 		cout << _erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) << endl;
 	else if(_erModel->checkSetCardinality(firstComponentID, secondComponentID))
-	{
-		cout << TEXT_CONNECTION_CARDINALITY << endl;
-		cout << TEXT_CONNECTION_CARDINALITYOPTION;
-		cin >> cardinalityOption;
-		switch(atoi(cardinalityOption.c_str()))
-		{
-		case CardinalityOptionOne:
-			cardinalityOption = PARAMETER_CARDINALITYOPTION_ONE;
-			break;
-		case CardinalityOptionTwo:
-			cardinalityOption = PARAMETER_CARDINALITYOPTION_TWO;
-			break;
-		default:
-			break;
-		}
-		_erModel->addConnection(firstComponentID, secondComponentID, cardinalityOption);
-	}
+		_erModel->addConnectionCmd(firstComponentID, secondComponentID, chooseCardinality());
 	else
-		_erModel->addConnection(firstComponentID, secondComponentID, PARAMETER_NULL);
+		_erModel->addConnectionCmd(firstComponentID, secondComponentID, PARAMETER_NULL);
+
+	displayConnectionTable();
 }
 
+string TextUI::chooseCardinality()
+{
+	string cardinalityOption;
+
+	cout << TEXT_CONNECTION_CARDINALITY << endl;
+	cout << TEXT_CONNECTION_CARDINALITYOPTION;
+	cin >> cardinalityOption;
+
+	switch(atoi(cardinalityOption.c_str()))
+	{
+	case CardinalityOptionOne:
+		return PARAMETER_CARDINALITYOPTION_ONE;
+	case CardinalityOptionTwo:
+		return PARAMETER_CARDINALITYOPTION_TWO;
+	default:
+		break;
+	}
+	return PARAMETER_NULL;
+}
 void TextUI::displayComponentTable()
 {
 	if (_erModel->getComponentTableSize() > 0)
@@ -284,6 +286,8 @@ void TextUI::loadERDiagram()
 	cin >> fileName;
 
 	_erModel->loadERDiagram(fileName);
+	displayComponentTable();
+	displayConnectionTable();
 }
 
 void TextUI::deleteComponent()
@@ -291,19 +295,37 @@ void TextUI::deleteComponent()
 	string delComponentID;
 	cout << TEXT_DELETE_ENTERNODE;
 	delComponentID = searchComponent(PARAMETER_ALL);
-	_erModel->deleteFunction(atoi(delComponentID.c_str()));
+	_erModel->deleteCmd(atoi(delComponentID.c_str()));
 	
 	cout << TEXT_DELETE_DELETEFINISH_ONE << delComponentID << TEXT_DELETE_DELETEFINISH_TWO << endl;
+
+	displayComponentTable();
+	displayConnectionTable();
 }
 
 void TextUI::undoCmd()
 {
-	_erModel->undoCmd();
+	if (_erModel->undoCmd())
+	{
+		cout << TEXT_UNDO_SUCCESS << endl;
+		displayComponentTable();
+		displayConnectionTable();
+	}
+	else
+		cout << TEXT_UNDO_FAILED << endl;
+	
 }
 
 void TextUI::redoCmd()
 {
-	_erModel->redoCmd();
+	if(_erModel->redoCmd())
+	{
+		cout << TEXT_REDO_SUCCESS << endl;
+		displayComponentTable();
+		displayConnectionTable();
+	}
+	else
+		cout << TEXT_REDO_FAILED << endl;
 }
 
 //////////////////////////////////////////////////////////////////////////

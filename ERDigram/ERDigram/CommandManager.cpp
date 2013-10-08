@@ -31,24 +31,28 @@ void CommandManager::execute(Command* cmd)
 	}
 }
 
-void CommandManager::redo()
+bool CommandManager::redo()
 {
 	if (_redoCmds.size() == 0)
-		return; // or throw exception
+		return false; // or throw exception
 
 	Command* c = _redoCmds.top();
 	_redoCmds.pop();
 	c->execute(); // redo the command
 	_undoCmds.push(c);
+
+	return true;
 }
 
-void CommandManager::undo()
+bool CommandManager::undo()
 {
 	if (_undoCmds.size() == 0)
-		return;
+		return false;
 
 	Command* c = _undoCmds.top();
 	_undoCmds.pop();
 	c->unexecute(); // undo the command
 	_redoCmds.push(c);
+
+	return true;
 }

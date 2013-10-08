@@ -35,6 +35,8 @@
 #include <vector>
 #include <direct.h>
 #include "AddComponentCmd.h"
+#include "ConnectComponentsCmd.h"
+#include "DeleteComponentCmd.h"
 #include "Component.h"
 #include "ComponentFactory.h"
 #include "CommandManager.h"
@@ -43,6 +45,8 @@
 using namespace std;
 
 class AddComponentCmd;
+class ConnectComponentsCmd;
+class DeleteComponentCmd;
 
 class ERModel
 {
@@ -55,9 +59,11 @@ public:
 	int getComponentTableSize();
 	int getConnectionTableSize();
 	int getComponentID();
-	void addConnection(int, int, string);
+	int addConnection(int, int, string);
+	int addConnection(int, int, int, string);
 	void setCardinality(Component*, Component*, string);
 	void setPrimaryKey(int, vector<int>);
+	void reBuildPrimaryKeyFromAttribute(int, int);
 	void setForeignKey();
 	void loadERDiagram(string);
 	void saveERDiagram(string);
@@ -70,8 +76,10 @@ public:
 	void deleteTableSet(int, vector<Component*>, int);
 	void deleteConnection(Component*);
 	void addNodeCmd(string, string);
-	void undoCmd();
-	void redoCmd();
+	void addConnectionCmd(int, int, string);
+	void deleteCmd(int);
+	bool undoCmd();
+	bool redoCmd();
 	void setComponentID(int);
 	bool searchComponentExist(string, string);
 	bool connectedItself(Component*, Component*);

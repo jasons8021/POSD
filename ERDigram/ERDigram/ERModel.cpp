@@ -38,7 +38,13 @@ int ERModel::addNode( int componentID, string type, string text )
 //////////////////////////////////////////////////////////////////////////
 //							AddConnection								//
 //////////////////////////////////////////////////////////////////////////
-void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string text )
+
+int ERModel::addConnection( int sourceNodeID, int destinationNodeID, string text )
+{
+	return addConnection(_componentID++, sourceNodeID, destinationNodeID, text);
+}
+
+int ERModel::addConnection( int componentID, int sourceNodeID, int destinationNodeID, string text )
 {
 	Component* sourceNode = searchComponent(sourceNodeID);
 	Component* destinationNode = searchComponent(destinationNodeID);
@@ -48,7 +54,7 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 
 	if (checkConnectionState(sourceNode, destinationNode) == TEXT_CONNECTION_CANCONNECT)
 	{
-		newConnection = static_cast<Component*>(componentFactory->creatComponent(_componentID++, PARAMETER_CONNECTOR, text));
+		newConnection = static_cast<Component*>(componentFactory->creatComponent(componentID, PARAMETER_CONNECTOR, text));
 		_components.push_back(newConnection);
 
 		static_cast<Connector*>(newConnection)->setConnectedNode(sourceNode, destinationNode);
@@ -60,6 +66,8 @@ void ERModel::addConnection( int sourceNodeID, int destinationNodeID, string tex
 			setCardinality(sourceNode, destinationNode, text);
 	}
 	delete componentFactory;
+
+	return newConnection->getID();
 }
 
 //	Check Connection hasn't any error. If it has, return error message.
@@ -73,7 +81,6 @@ string ERModel::getCheckConnectionStateMessage( int sourceNodeID, int destinatio
 {
 	Component* sourceNode = searchComponent(sourceNodeID);
 	Component* desinationNode = searchComponent(destinationNodeID);
-
 	return checkConnectionState(sourceNode, desinationNode);
 }
 
@@ -89,7 +96,6 @@ bool ERModel::checkSetCardinality( int sourceNodeID, int destinationNodeID )
 	else
 		return false;
 }
-
 
 void ERModel::setCardinality( Component* sourceNode, Component* destinationNode, string cardinality )
 {
@@ -159,6 +165,15 @@ void ERModel::setPrimaryKey( int entityID, vector<int> primaryKeys )
 		static_cast<NodeAttribute*>(attributeNode)->setIsPrimaryKey(true);
 		entityNode->setPrimaryKey(attributeNode->getID());
 	}
+}
+
+void ERModel::reBuildPrimaryKeyFromAttribute( int attributeID, int entityID )
+{
+	NodeAttribute* attributeNode = static_cast<NodeAttribute*>(searchComponent(attributeID));
+	NodeEntity* entityNode = static_cast<NodeEntity*>(searchComponent(entityID));
+
+	attributeNode->setIsPrimaryKey(true);
+	entityNode->setPrimaryKey(attributeID);
 }
 
 string ERModel::searchAttributeOfEntity( int entityID )
@@ -543,7 +558,7 @@ string ERModel::savePrimaryKeyTable()
 void ERModel::deleteFunction( int componentID )
 {
 	Component* delComponent = searchComponent(componentID);
-	
+
 	if (delComponent->getType() != PARAMETER_CONNECTOR)
 		deleteComponent(delComponent);
 	else
@@ -555,23 +570,23 @@ void ERModel::deleteComponent( Component* delComponent )
 	//	與要刪除的Component有關連的Component
 	vector<Component*> relatedComponents = searchRelatedComponent(delComponent->getID());
 	//	與要刪除的Component有關連的Connector ID
-	vector<Component*> relatedConnections = searchConnection(delComponent->getID());
-	int relatedConnectionsEndIndex = relatedConnections.size() - 1;
+	vector<Component*> relatedConnectors = searchConnection(delComponent->getID());
+	int relatedConnectionsEndIndex = relatedConnectors.size() - 1;
 	int delID;
 
-	//	走訪每個有關連的Component
+	//	走訪每個有關連的Component，並刪除其中connection的delComponent
 	for (int i = 0; i < relatedComponents.size(); i++)
 		relatedComponents[i]->deleteConnectedComponent(delComponent->getID());
 	
 	//	刪除Components中的Connector
-	while(relatedConnections.size() > 0)
+	while(relatedConnectors.size() > 0)
 	{
-		delID = relatedConnections[relatedConnectionsEndIndex]->getID();
+		delID = relatedConnectors[relatedConnectionsEndIndex]->getID();
 		deleteTableSet(delID, _components, PARAMETER_COMPONENTSTABLE);
 		deleteTableSet(delID, _connections, PARAMETER_CONNECTIONSTABLE);
 
-		relatedConnections.pop_back();
-		relatedConnectionsEndIndex = relatedConnections.size() - 1;
+		relatedConnectors.pop_back();
+		relatedConnectionsEndIndex = relatedConnectors.size() - 1;
 	}
 	deleteTableSet(delComponent->getID(), _components, PARAMETER_COMPONENTSTABLE);
 }
@@ -595,7 +610,8 @@ void ERModel::deleteTableSet( int delID, vector<Component*> targetTableSet, int 
 	{
 		if (delID == targetTableSet[i]->getID())
 		{
-			switch(tableType){
+			switch(tableType)
+			{
 			case PARAMETER_COMPONENTSTABLE:
 				_components.erase(_components.begin()+i);
 				break;
@@ -619,14 +635,24 @@ void ERModel::addNodeCmd( string type, string text )
 	_cmdManager.execute(new AddComponentCmd(this, type, text));
 }
 
-void ERModel::undoCmd()
+void ERModel::addConnectionCmd( int sourceNodeID, int destinationNodeID, string text )
 {
-	_cmdManager.undo();
+	_cmdManager.execute(new ConnectComponentsCmd(this, sourceNodeID, destinationNodeID, text));
 }
 
-void ERModel::redoCmd()
+void ERModel::deleteCmd( int delComponentID )
 {
-	_cmdManager.redo();
+	_cmdManager.execute(new DeleteComponentCmd(this, delComponentID));
+}
+
+bool ERModel::undoCmd()
+{
+	return _cmdManager.undo();
+}
+
+bool ERModel::redoCmd()
+{
+	return _cmdManager.redo();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -764,5 +790,3 @@ int ERModel::getComponentID()
 {
 	return _componentID;
 }
-
-

@@ -25,6 +25,8 @@ public:
 	vector<int> getForeignKey();
 	void setPrimaryKey(int);
 	vector<int> getPrimaryKey();
+	void deleteKeys(int);
+	virtual void deleteConnectedComponent(int);
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:

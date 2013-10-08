@@ -1,4 +1,6 @@
 #include "NodeRelationship.h"
+#include <iostream>
+
 
 NodeRelationship::NodeRelationship()
 {
@@ -41,4 +43,19 @@ void NodeRelationship::setEntityCardinality( pair<int, string> entityCardinality
 vector<pair<int, string>> NodeRelationship::getEntityCardinality()
 {
 	return this->_entityCardinalitySet;
+}
+
+void NodeRelationship::deleteConnectedComponent( int delComponentID )
+{
+	Component::deleteConnectedComponent(delComponentID);
+	deleteEntityCardinality(delComponentID);
+}
+
+void NodeRelationship::deleteEntityCardinality( int delComponentID )
+{
+	for(int i = 0; i < _entityCardinalitySet.size(); i++)
+	{
+		if (_entityCardinalitySet[i].first == delComponentID)
+			_entityCardinalitySet.erase(_entityCardinalitySet.begin()+i);
+	}
 }

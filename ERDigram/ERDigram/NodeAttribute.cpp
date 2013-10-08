@@ -29,12 +29,12 @@ string NodeAttribute::canConnectTo( Component* targetNode )
 
 	if (targetNode->getType() == PARAMETER_ENTITY && !(_connectedEntity))
 	{
-		if (checkMessage == TEXT_CONNECTION_CANCONNECT)		// TargetNode can be connected.
+		if (checkMessage == TEXT_CONNECTION_CANCONNECT)		// 可以跟目標Component進行connect
 			return TEXT_CONNECTION_CANCONNECT;
-		else											// Already connected or connected itself
+		else												// 與目標Component已經connect 或 connect自己
 			return checkMessage;
 	}
-	else												// Type error
+	else													//	型態不符 或 此Attribute已經與其他Entity相連
 		return TEXT_NODENUMBEGIN + targetNode->getIDString() + TEXT_CONNECTION_NOTCONNECTION + this->getIDString() + TEXT_ENDTEXT;
 }
 
@@ -46,4 +46,10 @@ bool NodeAttribute::getIsPrimaryKey()
 void NodeAttribute::setIsPrimaryKey( bool isPK )
 {
 	this->_isPrimaryKey = isPK;
+}
+
+void NodeAttribute::deleteConnectedComponent( int delComponentID )
+{
+	Component::deleteConnectedComponent(delComponentID);
+	_connectedEntity = false;
 }

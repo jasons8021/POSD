@@ -59,6 +59,12 @@
 #define TEXT_DELETE_DELETEFINISH_ONE "The component '"
 #define TEXT_DELETE_DELETEFINISH_TWO "' has been deleted."
 
+// Choice 9.undo/redo
+#define TEXT_UNDO_SUCCESS "Undo succeed"
+#define TEXT_REDO_SUCCESS "Redo succeed"
+#define TEXT_UNDO_FAILED "Undo failed"
+#define TEXT_REDO_FAILED "Redo failed"
+
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
 #define TEXT_DEMARCATION_CONNECTIONTABLE "--------------------------"
@@ -115,6 +121,7 @@ public:
 	void deleteComponent();
 	void undoCmd();
 	void redoCmd();
+	string chooseCardinality();
 	string searchComponent(string);
 	string searchEntity(string);
 	vector<int> searchAttribute(string);

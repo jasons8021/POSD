@@ -70,3 +70,25 @@ vector<int> NodeEntity::getPrimaryKey()
 {
 	return this->_primaryKeySet;
 }
+
+void NodeEntity::deleteConnectedComponent( int delComponentID )
+{
+	Component::deleteConnectedComponent(delComponentID);
+	deleteKeys(delComponentID);
+}
+
+//	刪除與delComponent有關的ForeignKey跟PrimaryKey
+void NodeEntity::deleteKeys( int delComponentID )
+{
+	for (int i = 0; i < _primaryKeySet.size(); i++)
+	{
+		if (_primaryKeySet[i] == delComponentID)
+			_primaryKeySet.erase(_primaryKeySet.begin()+i);
+	}
+
+	for (int i = 0; i < _foreignKeySet.size(); i++)
+	{
+		if (_foreignKeySet[i] == delComponentID)
+			_foreignKeySet.erase(_foreignKeySet.begin()+i);
+	}
+}

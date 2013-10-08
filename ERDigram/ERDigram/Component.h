@@ -30,7 +30,7 @@ public:
 	bool searchConnections(int);
 	void pushConnection(Component*);
 	vector<Component*> getConnections();
-	void deleteConnectedComponent(int);
+	virtual void deleteConnectedComponent(int);
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:

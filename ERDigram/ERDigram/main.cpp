@@ -8,5 +8,7 @@ int main(int argc, char *argv[])
 	textUI = new TextUI(new ERModel());
 	textUI->displayMenu();
 
+	delete textUI;
+
 	return 0;
 }
