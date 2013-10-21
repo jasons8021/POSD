@@ -6,6 +6,7 @@ NodeEntity::NodeEntity()
 
 NodeEntity::NodeEntity( int id, string text ) : Node( id, PARAMETER_ENTITY, text )
 {
+	_isShowForeignKeyinERTable = false;
 	_foreignKeySet.clear();
 }
 
@@ -91,4 +92,14 @@ void NodeEntity::deleteKeys( int delComponentID )
 		if (_foreignKeySet[i] == delComponentID)
 			_foreignKeySet.erase(_foreignKeySet.begin()+i);
 	}
+}
+
+bool NodeEntity::getIsShowForeignKeyinERTable()
+{
+	return _isShowForeignKeyinERTable;
+}
+
+void NodeEntity::setIsShowForeignKeyinERTable( bool isShowForeignKey )
+{
+	_isShowForeignKeyinERTable = isShowForeignKey;
 }

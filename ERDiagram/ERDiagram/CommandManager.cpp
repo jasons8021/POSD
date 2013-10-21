@@ -7,14 +7,14 @@ CommandManager::CommandManager()
 CommandManager::~CommandManager()
 {
 	while (!_undoCmds.empty()) {
-		Command* c = _undoCmds.top();
+		Command* cmd = _undoCmds.top();
 		_undoCmds.pop();
-		delete c;
+		delete cmd;
 	}
 	while (!_redoCmds.empty()) {
-		Command* c = _redoCmds.top();
+		Command* cmd = _redoCmds.top();
 		_redoCmds.pop();
-		delete c;
+		delete cmd;
 	}
 }
 
@@ -25,9 +25,9 @@ void CommandManager::execute(Command* cmd)
 
 	// cleanup and release redoable commands
 	while (!_redoCmds.empty()) {
-		Command* c = _redoCmds.top();
+		Command* command = _redoCmds.top();
 		_redoCmds.pop();
-		delete c;
+		delete command;
 	}
 }
 
@@ -36,10 +36,10 @@ bool CommandManager::redo()
 	if (_redoCmds.size() == 0)
 		return false; // or throw exception
 
-	Command* c = _redoCmds.top();
+	Command* cmd = _redoCmds.top();
 	_redoCmds.pop();
-	c->execute(); // redo the command
-	_undoCmds.push(c);
+	cmd->execute(); // redo the command
+	_undoCmds.push(cmd);
 
 	return true;
 }
@@ -49,10 +49,10 @@ bool CommandManager::undo()
 	if (_undoCmds.size() == 0)
 		return false;
 
-	Command* c = _undoCmds.top();
+	Command* cmd = _undoCmds.top();
 	_undoCmds.pop();
-	c->unexecute(); // undo the command
-	_redoCmds.push(c);
+	cmd->unexecute(); // undo the command
+	_redoCmds.push(cmd);
 
 	return true;
 }

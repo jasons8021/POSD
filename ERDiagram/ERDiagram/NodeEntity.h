@@ -21,8 +21,10 @@ public:
 	NodeEntity();
 	NodeEntity(int, string);
 	virtual ~NodeEntity();
+	bool getIsShowForeignKeyinERTable();
 	void setPrimaryKey(int);
 	void setForeignKey(int);
+	void setIsShowForeignKeyinERTable(bool);
 	void deleteKeys(int);
 	vector<int> getPrimaryKey();
 	vector<int> getForeignKey();
@@ -30,6 +32,7 @@ public:
 	virtual void connectTo(Component*);
 	virtual string canConnectTo(Component*);
 private:
+	bool _isShowForeignKeyinERTable;
 	vector<int> _primaryKeySet;
 	vector<int> _foreignKeySet;
 };

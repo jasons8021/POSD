@@ -10,7 +10,6 @@ ERModel::ERModel()
 ERModel::~ERModel()
 {
 	resetERModel();
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -230,9 +229,9 @@ string ERModel::getERDiagramTable()
 		attributeInEntitySet = searchSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, entitySet[i]->getConnections());
 		erDiagramRowString += getAttributeContents(attributeInEntitySet);
 		
-		if (!(static_cast<NodeEntity*>(entitySet[i])->getForeignKey()).empty())
+		for(int j = 0; j < static_cast<NodeEntity*>(entitySet[i])->getForeignKey().size(); j++)
 		{
-			for(int j = 0; j < static_cast<NodeEntity*>(entitySet[i])->getForeignKey().size(); j++)
+			if (static_cast<NodeEntity*>(entitySet[i])->getIsShowForeignKeyinERTable())
 				erDiagramRowString += searchForeignKey(static_cast<NodeEntity*>(entitySet[i])->getForeignKey()[j]);
 		}
 		erDiagramRowString += TEXT_ENDLINE;
@@ -286,10 +285,13 @@ void ERModel::setForeignKey()
 		if (!oneToOneEntityID.empty())
 		{
 			setFKEntityNodeFirst = static_cast<NodeEntity*>(searchComponent(oneToOneEntityID[0]));
-// 			setFKEntityNodeSecond = static_cast<NodeEntity*>(searchComponent(oneToOneEntityID[1]));
+ 			setFKEntityNodeSecond = static_cast<NodeEntity*>(searchComponent(oneToOneEntityID[1]));
 
 			setFKEntityNodeFirst->setForeignKey(oneToOneEntityID[1]);
-// 			setFKEntityNodeSecond->setForeignKey(oneToOneEntityID[0]);
+ 			setFKEntityNodeSecond->setForeignKey(oneToOneEntityID[0]);
+			
+			setFKEntityNodeFirst->setIsShowForeignKeyinERTable(true);
+			setFKEntityNodeSecond->setIsShowForeignKeyinERTable(false);
 		}
 	}
 }

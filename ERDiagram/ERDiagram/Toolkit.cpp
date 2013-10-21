@@ -24,15 +24,15 @@ string Toolkit::integerToString( int targetNum )
 
 vector<string> Toolkit::splitFunction( string unSplitText, string splitChar )
 {
-	string::size_type pos = 0;
+	string::size_type stringPosition = 0;
 	vector<string> splitTextSet;
 	string token;
 
 	unSplitText += splitChar;
-	while ((pos = unSplitText.find(splitChar)) != std::string::npos) {
-		token = unSplitText.substr(0, pos);
+	while ((stringPosition = unSplitText.find(splitChar)) != std::string::npos) {
+		token = unSplitText.substr(0, stringPosition);
 		splitTextSet.push_back(token);
-		unSplitText.erase(0, pos + splitChar.length());
+		unSplitText.erase(0, stringPosition + splitChar.length());
 	}
 
 	return splitTextSet;
