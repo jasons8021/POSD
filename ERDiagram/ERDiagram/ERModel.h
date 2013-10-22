@@ -101,11 +101,11 @@ class ERModel
 	FRIEND_TEST(ERModelTest, recoveryConnection);
 	FRIEND_TEST(ERModelTest, recoveryPrimaryKey);
 	FRIEND_TEST(ERModelTest, saveERDiagram);
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
+	FRIEND_TEST(ERModelTest, savePrimaryKeyTable);
+	FRIEND_TEST(ERModelTest, deleteFunction);
+	FRIEND_TEST(ERModelTest, deleteComponent);
+	FRIEND_TEST(ERModelTest, deleteConnection);
+	FRIEND_TEST(ERModelTest, deleteTableSet);
 	//FRIEND_TEST(ERModelTest, );
 	//FRIEND_TEST(ERModelTest, );
 	//FRIEND_TEST(ERModelTest, );

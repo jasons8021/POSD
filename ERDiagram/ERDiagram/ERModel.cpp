@@ -647,8 +647,6 @@ void ERModel::deleteTableSet( int delID, vector<Component*> targetTableSet, int 
 			case PARAMETER_CONNECTIONSTABLE:
 				_connections.erase(_connections.begin()+i);
 				break;
-			default:
-				break;
 			}
 			break;
 		}

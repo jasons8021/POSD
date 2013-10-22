@@ -8,6 +8,8 @@
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_ISERROR -1
 #define PARAMETER_NULL ""
+#define PARAMETER_COMPONENTSTABLE 0
+#define PARAMETER_CONNECTIONSTABLE 1
 
 #include "gtest/gtest.h"
 #include "ERModel.h"
