@@ -12,6 +12,9 @@ class ERModel;
 
 class ConnectComponentsCmd : public Command
 {
+	friend class ConnectComponentsCmdTest;
+	FRIEND_TEST(ConnectComponentsCmdTest, execute);
+	FRIEND_TEST(ConnectComponentsCmdTest, unexecute);
 public:
 	ConnectComponentsCmd(ERModel* erModel, int, int, string);
 	virtual ~ConnectComponentsCmd();

@@ -13,6 +13,7 @@
 #define PARAMETER_RELATIONSHIP "R"
 
 #include <vector>
+#include <gtest/gtest_prod.h>
 #include "Node.h"
 #include "Toolkit.h"
 
@@ -20,8 +21,12 @@ using namespace std;
 
 class NodeRelationship : public Node
 {
+	friend class NodeRelationshipTest;
+	FRIEND_TEST(NodeRelationshipTest, connectTo);
+	FRIEND_TEST(NodeRelationshipTest, setEntityCardinality);
+	FRIEND_TEST(NodeRelationshipTest, deleteConnectedComponent);
+	FRIEND_TEST(NodeRelationshipTest, deleteEntityCardinality);
 public:
-	NodeRelationship();
 	NodeRelationship(int, string);
 	virtual ~NodeRelationship();
 	void setEntityCardinality(pair<int, string>);

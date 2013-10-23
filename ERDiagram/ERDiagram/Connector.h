@@ -5,12 +5,13 @@
 #define PARAMETER_NULL ""
 
 #include <vector>
+#include <gtest/gtest_prod.h>
 #include "Component.h"
 
 class Connector : public Component
 {
+	friend class ConnectorTest;
 public:
-	Connector();
 	Connector(int, string);
 	~Connector();
 	int getSourceNodeID();

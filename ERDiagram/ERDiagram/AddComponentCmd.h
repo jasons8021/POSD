@@ -11,6 +11,9 @@
 class ERModel;
 
 class AddComponentCmd : public Command {
+	friend class AddComponentCmdTest;
+	FRIEND_TEST(AddComponentCmdTest, execute);
+	FRIEND_TEST(AddComponentCmdTest, unexecute);
 public:
 	AddComponentCmd(ERModel* erModel, string, string);
 	virtual ~AddComponentCmd();

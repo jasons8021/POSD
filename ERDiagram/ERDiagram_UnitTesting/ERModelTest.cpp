@@ -19,12 +19,17 @@ void ERModelTest::SetUp()
 			_erModel->_components.push_back(new NodeEntity(i, testText[i]));
 		else
 			_erModel->_components.push_back(new NodeRelationship(i, testText[i]));
+		_erModel->_componentID++;
 	}
 }
 
 void ERModelTest::TearDown()
 {
 	delete _erModel;
+	remove("unitTest/UnitTestSaveERDiagram.erd");
+	_rmdir("unitTest");
+	remove("CreatPathTest/CreatPathTestFile.txt");
+	_rmdir("CreatPathTest");
 }
 
 TEST_F(ERModelTest, addNode){
@@ -552,6 +557,7 @@ TEST_F(ERModelTest, loadERDiagram){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	// 錯誤的檔名
@@ -601,6 +607,7 @@ TEST_F(ERModelTest, recoveryFile){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	resultSet = _erModel->classifyInputFile("E, Engineer\nA, Emp_ID\nR, Has\nA, Name\nC\nC\n\n4 0,1\n5 0,3\n\n0 1,3");
@@ -623,6 +630,8 @@ TEST_F(ERModelTest, recoveryAllComponent){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
+
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	testComponentSet.push_back("E, Engineer");
@@ -652,6 +661,7 @@ TEST_F(ERModelTest, recoveryConnection){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	EXPECT_EQ(0, _erModel->addNode(0, "E", "Engineer"));
@@ -690,6 +700,7 @@ TEST_F(ERModelTest, recoveryPrimaryKey){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	
@@ -745,6 +756,7 @@ TEST_F(ERModelTest, saveERDiagram){
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
 	EXPECT_TRUE(_erModel->_components.empty());
 
 	EXPECT_EQ(0, _erModel->addNode(0, "E", "Engineer"));
@@ -912,7 +924,7 @@ TEST_F(ERModelTest, deleteComponent){
 	}
 	EXPECT_TRUE(checkDeleteResult);
 }
-// "A0", "E1", "R2", "A3", "A4", "A5", "E6", "R7", "E8", "E9"
+
 TEST_F(ERModelTest, deleteConnection){
 	bool checkDeleteResult = false;
 
@@ -1002,64 +1014,452 @@ TEST_F(ERModelTest, deleteTableSet){
 	}
 	EXPECT_TRUE(checkDeleteResult);
 }
-/*
-TEST_F(ERModelTest, addNodeCmd){
 
+TEST_F(ERModelTest, addNodeCmd){
+	bool checkResult = false;
+
+	_erModel->addNodeCmd("A", "CmdA10");
+
+	if (_erModel->_components[10]->getID() == 10 && _erModel->_components[10]->getText() == "CmdA10")
+		checkResult = true;
+	else
+		checkResult = false;
+
+	EXPECT_TRUE(checkResult);
 }
 
 TEST_F(ERModelTest, addConnectionCmd){
+	bool checkResult = false;
 
+	_erModel->addConnectionCmd(0, 1, PARAMETER_NULL);
+
+	if (_erModel->_connections[0]->getID() == 10 && _erModel->_connections[0]->getText() == PARAMETER_NULL)
+		checkResult = true;
+	else
+		checkResult = false;
+
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	_erModel->addConnectionCmd(1, 2, "N");
+
+	if (_erModel->_connections[1]->getID() == 11 && _erModel->_connections[1]->getText() == "N")
+		checkResult = true;
+	else
+		checkResult = false;
+	EXPECT_TRUE(checkResult);
 }
 
 TEST_F(ERModelTest, deleteCmd){
+	bool checkDeleteResult = false;
 
+	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
+	EXPECT_EQ(12, _erModel->addConnection(12, 1, 4, PARAMETER_NULL));
+	EXPECT_EQ(13, _erModel->addConnection(13, 5, 8, PARAMETER_NULL));
+
+	_erModel->deleteCmd(3);
+	// 檢查與刪除掉的component的連接關係是否被移除
+	for (int i = 0; i < _erModel->_components[1]->getConnections().size(); i++)
+	{
+		if (_erModel->_components[1]->getConnections()[i]->getID() == 3)
+		{
+			checkDeleteResult = false;
+			break;
+		}
+		else
+			checkDeleteResult = true;
+	}
+	EXPECT_TRUE(checkDeleteResult);
+
+	// 檢查與A3有關係的Connector是否移除
+	checkDeleteResult = false;
+	for (int i = 0; i < _erModel->_connections.size(); i++)
+	{
+		if (_erModel->_connections[i]->getID() == 11)
+		{
+			checkDeleteResult = false;
+			break;
+		}
+		else
+			checkDeleteResult = true;
+	}
+	EXPECT_TRUE(checkDeleteResult);
+
+	// 檢查Component中的3是否移除
+	checkDeleteResult = false;
+	for (int i = 0; i < _erModel->_components.size(); i++)
+	{
+		if (_erModel->_components[i]->getID() == 3)
+		{
+			checkDeleteResult = false;
+			break;
+		}
+		else
+			checkDeleteResult = true;
+	}
+	EXPECT_TRUE(checkDeleteResult);
 }
 
 TEST_F(ERModelTest, undoCmd){
+	bool checkResult = false;
 
+	// 還沒有用Command，所以不能undo
+	EXPECT_FALSE(_erModel->undoCmd());
+
+	//
+	// 測試AddNode的undo
+	//
+	_erModel->addNodeCmd("A", "CmdA10");
+	EXPECT_TRUE(_erModel->undoCmd());
+
+	// 檢查Component中的10是否被還原，看大小就可以知道
+	checkResult = false;
+	if (_erModel->_components.size() == 11)
+		checkResult = false;
+	else
+		checkResult = true;
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	//
+	// 測試Connection的undo
+	//
+	_erModel->addConnectionCmd(0, 1, PARAMETER_NULL);
+	EXPECT_TRUE(_erModel->undoCmd());
+
+	// 檢查與A3有關係的Connector是否移除
+	checkResult = false;
+	
+	if (_erModel->_connections.size() == 1)
+		checkResult = false;
+	else
+		checkResult = true;
+	
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查與刪除掉的Connector連接的兩個Component，彼此關係是否被移除
+	// SourceNode檢查Connection大小，因為都沒有連接，所以是0
+	if (_erModel->_components[0]->getConnections().size() == 0)
+		checkResult = true;
+	else
+		checkResult = false;
+
+	// destinationNode檢查Connection大小，因為都沒有連接，所以是0
+	if (_erModel->_components[1]->getConnections().size() == 0)
+		checkResult = true;
+	else
+		checkResult = false;
+
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	//
+	// 測試Delete的undo
+	//
+	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
+	EXPECT_EQ(12, _erModel->addConnection(12, 1, 4, PARAMETER_NULL));
+	EXPECT_EQ(13, _erModel->addConnection(13, 5, 8, PARAMETER_NULL));
+
+	_erModel->deleteCmd(3);
+	EXPECT_TRUE(_erModel->undoCmd());
+
+	// 檢查大小是否有回來12(砍掉C11跟A3)->14
+	if (_erModel->_components.size() == 14)
+		checkResult = true;
+	else
+		checkResult = false;
+
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查與刪除掉的component的連接關係是否被還原
+	for (int i = 0; i < _erModel->_components[1]->getConnections().size(); i++)
+	{
+		if (_erModel->_components[1]->getConnections()[i]->getID() == 3)
+		{
+			checkResult = true;
+			break;
+		}
+		else
+			checkResult = false;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查與A3有關係的Connector是否還原
+	for (int i = 0; i < _erModel->_connections.size(); i++)
+	{
+		if (_erModel->_connections[i]->getID() == 11)
+		{
+			checkResult = true;
+			break;
+		}
+		else
+			checkResult = false;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查Component中的3是否還原
+	for (int i = 0; i < _erModel->_components.size(); i++)
+	{
+		if (_erModel->_components[i]->getID() == 3)
+		{
+			checkResult = true;
+			break;
+		}
+		else
+			checkResult = false;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
 }
 
 TEST_F(ERModelTest, redoCmd){
+	bool checkResult = false;
 
+	//
+	// 檢查Add的redo
+	//
+	_erModel->addNodeCmd("A", "CmdA10");
+	EXPECT_TRUE(_erModel->undoCmd());
+	EXPECT_TRUE(_erModel->redoCmd());
+
+	if (_erModel->_components[10]->getID() == 10 && _erModel->_components[10]->getText() == "CmdA10")
+		checkResult = true;
+	else
+		checkResult = false;
+
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	//
+	// 檢查Connection的redo
+	//
+	_erModel->addConnectionCmd(1, 2, "N");
+	EXPECT_TRUE(_erModel->undoCmd());
+	EXPECT_TRUE(_erModel->redoCmd());
+
+	if (_erModel->_connections[0]->getID() == 11 && _erModel->_connections[0]->getText() == "N")
+		checkResult = true;
+	else
+		checkResult = false;
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	//
+	// 檢查Delete的redo
+	//
+	EXPECT_EQ(12, _erModel->addConnection(12, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(13, _erModel->addConnection(13, 1, 3, PARAMETER_NULL));
+	EXPECT_EQ(14, _erModel->addConnection(14, 1, 4, PARAMETER_NULL));
+	EXPECT_EQ(15, _erModel->addConnection(15, 5, 8, PARAMETER_NULL));
+
+	_erModel->deleteCmd(3);
+	EXPECT_TRUE(_erModel->undoCmd());
+	EXPECT_TRUE(_erModel->redoCmd());
+
+	// 檢查與刪除掉的component的連接關係是否被移除
+	for (int i = 0; i < _erModel->_components[1]->getConnections().size(); i++)
+	{
+		if (_erModel->_components[1]->getConnections()[i]->getID() == 3)
+		{
+			checkResult = false;
+			break;
+		}
+		else
+			checkResult = true;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查與A3有關係的Connector是否移除
+	for (int i = 0; i < _erModel->_connections.size(); i++)
+	{
+		if (_erModel->_connections[i]->getID() == 13)
+		{
+			checkResult = false;
+			break;
+		}
+		else
+			checkResult = true;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
+
+	// 檢查Component中的3是否移除
+	for (int i = 0; i < _erModel->_components.size(); i++)
+	{
+		if (_erModel->_components[i]->getID() == 3)
+		{
+			checkResult = false;
+			break;
+		}
+		else
+			checkResult = true;
+	}
+	EXPECT_TRUE(checkResult);
+	checkResult = false;
 }
 
 TEST_F(ERModelTest, searchComponent){
-
+	EXPECT_EQ(_erModel->_components[0]->getText(), _erModel->searchComponent(0)->getText());
+	EXPECT_EQ(NULL, _erModel->searchComponent(10));
 }
 
 TEST_F(ERModelTest, searchComponentConnection){
-
+	_erModel->addConnectionCmd(1, 2, "N");
+	EXPECT_TRUE(_erModel->searchComponentConnection(1, PARAMETER_ENTITY, _erModel->_components[2]->getConnections()));
+	EXPECT_FALSE(_erModel->searchComponentConnection(1, PARAMETER_ATTRIBUTE, _erModel->_components[2]->getConnections()));
+	EXPECT_FALSE(_erModel->searchComponentConnection(2, PARAMETER_ENTITY, _erModel->_components[1]->getConnections()));
+	EXPECT_TRUE(_erModel->searchComponentConnection(2, PARAMETER_RELATIONSHIP, _erModel->_components[1]->getConnections()));
 }
 
 TEST_F(ERModelTest, searchComponentExist){
-
+	EXPECT_TRUE(_erModel->searchComponentExist("0", PARAMETER_ATTRIBUTE));
+	EXPECT_FALSE(_erModel->searchComponentExist("10", PARAMETER_ATTRIBUTE));
+	EXPECT_FALSE(_erModel->searchComponentExist("0", PARAMETER_ENTITY));
+	EXPECT_FALSE(_erModel->searchComponentExist("0", PARAMETER_RELATIONSHIP));
 }
 
 TEST_F(ERModelTest, searchSpecificTypeComponentSet){
+	vector<Component*> testAttributeSet;
+	vector<Component*> testEntitySet;
+	vector<Component*> testRelationshipSet;
+	vector<Component*> testConnectorSet;
 
+	testAttributeSet.push_back(_erModel->_components[0]);
+	testAttributeSet.push_back(_erModel->_components[3]);
+	testAttributeSet.push_back(_erModel->_components[4]);
+	testAttributeSet.push_back(_erModel->_components[5]);
+
+	testEntitySet.push_back(_erModel->_components[1]);
+	testEntitySet.push_back(_erModel->_components[6]);
+	testEntitySet.push_back(_erModel->_components[8]);
+	testEntitySet.push_back(_erModel->_components[9]);
+
+	testRelationshipSet.push_back(_erModel->_components[2]);
+	testRelationshipSet.push_back(_erModel->_components[7]);
+
+	_erModel->addConnectionCmd(1, 2, "N");
+	testConnectorSet.push_back(_erModel->_components[10]);
+
+	EXPECT_EQ(testAttributeSet, _erModel->searchSpecificTypeComponentSet(PARAMETER_ATTRIBUTE, _erModel->_components));
+	EXPECT_EQ(testEntitySet, _erModel->searchSpecificTypeComponentSet(PARAMETER_ENTITY, _erModel->_components));
+	EXPECT_EQ(testRelationshipSet, _erModel->searchSpecificTypeComponentSet(PARAMETER_RELATIONSHIP, _erModel->_components));
+	EXPECT_EQ(testConnectorSet, _erModel->searchSpecificTypeComponentSet(PARAMETER_CONNECTOR, _erModel->_components));
 }
 
 TEST_F(ERModelTest, getComponentDataList){
+	string allTypeResult = "  A   |  0   |  A0\n";
+	allTypeResult += "  E   |  1   |  E1\n";
+	allTypeResult += "  R   |  2   |  R2\n";
+	allTypeResult += "  A   |  3   |  A3\n";
+	allTypeResult += "  A   |  4   |  A4\n";
+	allTypeResult += "  A   |  5   |  A5\n";
+	allTypeResult += "  E   |  6   |  E6\n";
+	allTypeResult += "  R   |  7   |  R7\n";
+	allTypeResult += "  E   |  8   |  E8\n";
+	allTypeResult += "  E   |  9   |  E9\n";
 
+	string attributeTypeResult = "  A   |  0   |  A0\n";
+	attributeTypeResult += "  A   |  3   |  A3\n";
+	attributeTypeResult += "  A   |  4   |  A4\n";
+	attributeTypeResult += "  A   |  5   |  A5\n";
+
+	string entityTypeResult = "  E   |  1   |  E1\n";
+	entityTypeResult += "  E   |  6   |  E6\n";
+	entityTypeResult += "  E   |  8   |  E8\n";
+	entityTypeResult += "  E   |  9   |  E9\n";
+
+	string relationshipTypeResult = "  R   |  2   |  R2\n";
+	relationshipTypeResult += "  R   |  7   |  R7\n";
+
+
+	EXPECT_EQ(allTypeResult, _erModel->getComponentDataList(PARAMETER_ALL, _erModel->_components));
+	EXPECT_EQ(attributeTypeResult, _erModel->getComponentDataList(PARAMETER_ATTRIBUTE, _erModel->_components));
+	EXPECT_EQ(entityTypeResult, _erModel->getComponentDataList(PARAMETER_ENTITY, _erModel->_components));
+	EXPECT_EQ(relationshipTypeResult, _erModel->getComponentDataList(PARAMETER_RELATIONSHIP, _erModel->_components));
+
+	// 因為初始化中沒有Connector，所以用來測試搜尋不到結果的情況
+	EXPECT_EQ(PARAMETER_NULL, _erModel->getComponentDataList(PARAMETER_CONNECTOR, _erModel->_components));
+
+	while(_erModel->_components.size() > 0 )
+		_erModel->_components.pop_back();
+	EXPECT_EQ(PARAMETER_NULL, _erModel->getComponentDataList(PARAMETER_ALL, _erModel->_components));
 }
 
 TEST_F(ERModelTest, searchConnection){
+	vector<Component*> testRelatedConnectionSet;
 
+	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
+
+	testRelatedConnectionSet.push_back(_erModel->_connections[0]);
+	testRelatedConnectionSet.push_back(_erModel->_connections[1]);
+
+	EXPECT_EQ(testRelatedConnectionSet, _erModel->searchConnection(1));
 }
 
 TEST_F(ERModelTest, searchRelatedComponent){
+	vector<Component*> testRelatedComponentSet;
 
-}
+	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
 
-TEST_F(ERModelTest, getComponentTableSize){
+	testRelatedComponentSet.push_back(_erModel->_components[0]);
+	testRelatedComponentSet.push_back(_erModel->_components[3]);
 
-}
-
-TEST_F(ERModelTest, getConnectionTableSize){
-
+	EXPECT_EQ(testRelatedComponentSet, _erModel->searchRelatedComponent(1));
 }
 
 TEST_F(ERModelTest, resetERModel){
+	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
+	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
 
+	_erModel->resetERModel();
+	EXPECT_EQ(0,_erModel->_components.size());
+	EXPECT_EQ(0,_erModel->_connections.size());
+	EXPECT_EQ(0,_erModel->_componentID);
 }
-*/
+
+TEST_F(ERModelTest, sortCompoentsAndConnection){
+	const string testSortComponentsTextSet[6] = {"A0", "E1", "R2", "A3", "A4", "A5"};
+	const string testNotSortComponentsTextSet[6] = {"E1", "A0", "A3", "A5", "A4", "R2"};
+
+	EXPECT_EQ(11, _erModel->addConnection(11, 0, 1, "Connection0,1"));
+	EXPECT_EQ(10, _erModel->addConnection(10, 1, 3, "Connection1,3"));
+
+	EXPECT_EQ(1, static_cast<Connector*>(_erModel->_connections[0])->getDestinationNodeID());
+	EXPECT_EQ(3, static_cast<Connector*>(_erModel->_connections[1])->getDestinationNodeID());
+
+	_erModel->sortCompoentsAndConnection();
+
+	EXPECT_EQ(3, static_cast<Connector*>(_erModel->_connections[0])->getDestinationNodeID());
+	EXPECT_EQ(1, static_cast<Connector*>(_erModel->_connections[1])->getDestinationNodeID());
+
+	// 清空ERModel中的components，用來確認之後是否有恢復檔案
+	while(_erModel->_components.size() > 0)
+		_erModel->_components.pop_back();
+	_erModel->_componentID = 0;
+
+	EXPECT_TRUE(_erModel->_components.empty());
+
+	EXPECT_EQ(1, _erModel->addNode(1, "E", "E1"));
+	EXPECT_EQ(0, _erModel->addNode(0, "A", "A0"));
+	EXPECT_EQ(3, _erModel->addNode(3, "A", "A3"));
+	EXPECT_EQ(5, _erModel->addNode(5, "A", "A5"));
+	EXPECT_EQ(4, _erModel->addNode(4, "A", "A4"));
+	EXPECT_EQ(2, _erModel->addNode(2, "R", "R2"));
+
+	for (int i = 0; i < _erModel->_components.size(); i++)
+		EXPECT_EQ(testNotSortComponentsTextSet[i], _erModel->_components[i]->getText());
+	
+	_erModel->sortCompoentsAndConnection();
+	
+	for (int i = 0; i < _erModel->_components.size(); i++)
+		EXPECT_EQ(testSortComponentsTextSet[i], _erModel->_components[i]->getText());
+}

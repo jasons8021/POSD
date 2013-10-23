@@ -1,10 +1,5 @@
 #include "Connector.h"
 
-
-Connector::Connector()
-{
-}
-
 Connector::Connector( int id, string text ) : Component( id, PARAMETER_CONNECTOR, text )
 {
 

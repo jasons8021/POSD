@@ -1,5 +1,5 @@
-#ifndef ERMODELTEST_H_
-#define ERMODELTEST_H_
+#ifndef COMPONENTTEST_H_
+#define COMPONENTTEST_H_
 
 #define PARAMETER_ATTRIBUTE "A"
 #define PARAMETER_ENTITY "E"
@@ -8,20 +8,17 @@
 #define PARAMETER_ALL "ALLTYPE"
 #define PARAMETER_ISERROR -1
 #define PARAMETER_NULL ""
-#define PARAMETER_COMPONENTSTABLE 0
-#define PARAMETER_CONNECTIONSTABLE 1
 
 #include <gtest/gtest.h>
-#include <string>
-#include <fstream>
-#include "ERModel.h"
+#include "Component.h"
+#include "NodeAttribute.h"
+#include "NodeEntity.h"
+#include "NodeRelationship.h"
 
-using namespace std;
-
-class ERModelTest : public :: testing :: Test
+class ComponentTest : public :: testing :: Test
 {
 protected:
-	ERModel* _erModel;
+	Component* _component;
 	virtual void SetUp();
 	virtual void TearDown();
 };

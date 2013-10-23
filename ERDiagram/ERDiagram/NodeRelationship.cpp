@@ -1,11 +1,6 @@
 #include "NodeRelationship.h"
 #include <iostream>
 
-
-NodeRelationship::NodeRelationship()
-{
-}
-
 NodeRelationship::NodeRelationship( int id, string text ) : Node( id, PARAMETER_RELATIONSHIP, text )
 {
 }

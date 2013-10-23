@@ -19,6 +19,7 @@ using namespace std;
 
 class Component
 {
+	friend class ComponentTest;
 public:
 	Component();
 	Component(int, string, string);

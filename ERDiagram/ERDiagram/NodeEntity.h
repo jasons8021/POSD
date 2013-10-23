@@ -11,14 +11,19 @@
 #define PARAMETER_RELATIONSHIP "R"
 
 #include <vector>
+#include <gtest/gtest_prod.h>
 #include "Node.h"
 
 using namespace std;
 
 class NodeEntity : public Node
 {
+	friend class NodeEntityTest;
+	FRIEND_TEST(NodeEntityTest, connectTo);
+	FRIEND_TEST(NodeEntityTest, setPrimaryKey);
+	FRIEND_TEST(NodeEntityTest, setForeignKey);
+	FRIEND_TEST(NodeEntityTest, deleteKeys);
 public:
-	NodeEntity();
 	NodeEntity(int, string);
 	virtual ~NodeEntity();
 	bool getIsShowForeignKeyinERTable();

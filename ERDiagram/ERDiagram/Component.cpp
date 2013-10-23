@@ -71,7 +71,7 @@ void Component::pushConnection( Component* connectedNode)
 	_connections.push_back(connectedNode);
 }
 
-std::string Component::getIDString()
+string Component::getIDString()
 {
 	stringstream intNum;
 	string intToStringNum;

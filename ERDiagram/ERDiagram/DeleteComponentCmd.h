@@ -19,6 +19,9 @@ class ERModel;
 
 class DeleteComponentCmd : public Command
 {
+	friend class DeleteComponentCmdTest;
+	FRIEND_TEST(DeleteComponentCmdTest, execute);
+	FRIEND_TEST(DeleteComponentCmdTest, unexecute);
 public:
 	DeleteComponentCmd(ERModel* erModel, int);
 	virtual ~DeleteComponentCmd();

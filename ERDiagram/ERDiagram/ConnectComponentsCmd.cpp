@@ -19,6 +19,7 @@ void ConnectComponentsCmd::execute()
 	//	執行connect後，取得加入進去的componentID
 	if (_componentID == PARAMETER_NOVALUE)						// 不是Redo的情況
 		_componentID = _erModel->addConnection(_sourceNodeID, _destinationNodeID, _text);
+		
 	else														// Redo的情況
 	{
 		_erModel->setComponentID(_erModel->getComponentID() + PARAMETER_NEXTCOMPONENTID);

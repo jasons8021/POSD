@@ -14,6 +14,10 @@
 using namespace std;
 
 class CommandManager {
+// 	friend class CommandManagerTest;
+// 	FRIEND_TEST(CommandManagerTest, execute);
+// 	FRIEND_TEST(CommandManagerTest, redo);
+// 	FRIEND_TEST(CommandManagerTest, undo);
 public:
 	CommandManager();
 	virtual ~CommandManager();

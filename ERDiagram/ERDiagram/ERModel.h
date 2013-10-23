@@ -106,21 +106,35 @@ class ERModel
 	FRIEND_TEST(ERModelTest, deleteComponent);
 	FRIEND_TEST(ERModelTest, deleteConnection);
 	FRIEND_TEST(ERModelTest, deleteTableSet);
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
+	FRIEND_TEST(ERModelTest, addNodeCmd);
+	FRIEND_TEST(ERModelTest, addConnectionCmd);
+	FRIEND_TEST(ERModelTest, deleteCmd);
+	FRIEND_TEST(ERModelTest, undoCmd);
+	FRIEND_TEST(ERModelTest, redoCmd);
+	FRIEND_TEST(ERModelTest, searchComponent);
+	FRIEND_TEST(ERModelTest, searchComponentConnection);
+	FRIEND_TEST(ERModelTest, searchSpecificTypeComponentSet);
+	FRIEND_TEST(ERModelTest, getComponentDataList);
+	FRIEND_TEST(ERModelTest, searchConnection);
+	FRIEND_TEST(ERModelTest, searchRelatedComponent);
+	FRIEND_TEST(ERModelTest, resetERModel);
+	FRIEND_TEST(ERModelTest, sortCompoentsAndConnection);
+
+	friend class AddComponentCmdTest;
+	FRIEND_TEST(AddComponentCmdTest, execute);
+	FRIEND_TEST(AddComponentCmdTest, unexecute);
+
+	friend class ConnectComponentsCmdTest;
+	FRIEND_TEST(ConnectComponentsCmdTest, execute);
+	FRIEND_TEST(ConnectComponentsCmdTest, unexecute);
+
+	friend class DeleteComponentCmdTest;
+	FRIEND_TEST(DeleteComponentCmdTest, execute);
+	FRIEND_TEST(DeleteComponentCmdTest, unexecute);
+
+	friend class CommandManagerTest;
+	FRIEND_TEST(CommandManagerTest, execute);
+
 	//FRIEND_TEST(ERModelTest, );
 	//FRIEND_TEST(ERModelTest, );
 	//FRIEND_TEST(ERModelTest, );

@@ -1,11 +1,5 @@
 #include "NodeAttribute.h"
 
-NodeAttribute::NodeAttribute()
-{
-	_connectedEntity = false;
-	_isPrimaryKey = false;
-}
-
 NodeAttribute::NodeAttribute( int id, string text ) : Node( id, PARAMETER_ATTRIBUTE, text)
 {
 	_connectedEntity = false;

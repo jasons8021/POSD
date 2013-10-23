@@ -709,7 +709,7 @@ bool ERModel::searchComponentConnection( int searchNodeID, string searchType,vec
 			return true;
 	}
 	// Not find!
-	return NULL;
+	return false;
 }
 
 //	The method provides to textUI to check the component is exist.

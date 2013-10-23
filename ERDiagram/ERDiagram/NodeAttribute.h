@@ -14,13 +14,16 @@
 
 #include <vector>
 #include "Node.h"
+#include "gtest/gtest_prod.h"
 
 using namespace std;
 
 class NodeAttribute : public Node
 {
+	friend class NodeAttributeTest;
+	FRIEND_TEST(NodeAttributeTest, connectTo);
+	FRIEND_TEST(NodeAttributeTest, deleteConnectedComponent);
 public:
-	NodeAttribute();
 	NodeAttribute(int, string);
 	virtual ~NodeAttribute();
 	bool getIsPrimaryKey();
