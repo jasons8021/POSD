@@ -1,13 +1,12 @@
 #include "TextUI.h"
 
-TextUI::TextUI(ERModel* erModel)
+TextUI::TextUI(PresentationModel* presentationModel)
 {
-	this->_erModel = erModel;
+	_presentationModel = presentationModel;
 }
 
 TextUI::~TextUI()
 {
-	delete(_erModel);
 }
 
 void TextUI::displayMenu()
@@ -91,17 +90,18 @@ void TextUI::addNewNode()
 	cout << TEXT_ADDNEWNODE_NAME;
 	cin >> text;
 
-	_erModel->addNodeCmd(type,text);
-
-	displayComponentTable();
+	if (_presentationModel->addNodeCmd(type, text))
+		cout << _presentationModel->displayComponentTable_TextUI() << endl;
 }
 
 void TextUI::addConnection()
 {
 	int firstComponentID;
 	int secondComponentID;
+	bool checkCardinality;
+	string cardinality = PARAMETER_NULL;
 
-	if (_erModel->getComponentTableSize() > PARAMETER_ZEROCOMPONENT)
+	if (_presentationModel->getComponentTableSize() > PARAMETER_ZEROCOMPONENT)
 	{
 		// 第一個Component
 		cout << TEXT_CONNECTION_FIRSTNODE;
@@ -111,15 +111,14 @@ void TextUI::addConnection()
 		cout << TEXT_CONNECTION_SECONDNODE;
 		secondComponentID = atoi(searchComponent(PARAMETER_ALL).c_str());
 
-		// 如果要connection的兩個Component有問題，則回傳問題字串
-		if(_erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) != TEXT_CONNECTION_CANCONNECT)
-			cout << _erModel->getCheckConnectionStateMessage(firstComponentID,secondComponentID) << endl;
-		else if(_erModel->checkSetCardinality(firstComponentID, secondComponentID))
-			_erModel->addConnectionCmd(firstComponentID, secondComponentID, chooseCardinality());
-		else
-			_erModel->addConnectionCmd(firstComponentID, secondComponentID, PARAMETER_NULL);
+		// 如果是Relationship跟Entity互相連接，輸入Cardinality
+		if (_presentationModel->checkSetCardinality(firstComponentID, secondComponentID))
+			cardinality = chooseCardinality();
 
-		displayConnectionTable();
+		// 如果要connection的兩個Component有問題，則回傳問題字串
+		cout << _presentationModel->addConnectionCmd(firstComponentID, secondComponentID, cardinality) << endl;
+
+		cout << _presentationModel->displayConnectionTable_TextUI();
 	}
 	else
 		cout << TEXT_CONNECTION_NOCOMPONENT << endl;
@@ -145,138 +144,47 @@ string TextUI::chooseCardinality()
 	}
 	return PARAMETER_NULL;
 }
+
 void TextUI::displayComponentTable()
 {
-	if (_erModel->getComponentTableSize() > PARAMETER_ZEROCOMPONENT)
-	{
-		// ComponentTable format
-		cout << TEXT_ADDNEWNODE_TITLE << endl;
-		cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
-		cout << TEXT_COMPONENT_TABLEFORMAT << endl;
-		cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
-
-		// ComponentTable contents string
-		cout << _erModel->getComponentsTable(PARAMETER_ALL);
-
-		// ComponentTable End
-		cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
-	}
+	cout << _presentationModel->displayComponentTable_TextUI() << endl;
 }
 
 void TextUI::displayConnectionTable()
 {
-	if (_erModel->getConnectionTableSize() > PARAMETER_ZEROCOMPONENT)
-	{
-		// ConnectiontTable format
-		cout << TEXT_CONNECTION_TITLE << endl;
-		cout << TEXT_DEMARCATION_CONNECTIONTABLE << endl;
-		cout << TEXT_CONNECTION_TABLEFORMAT << endl;
-		cout << TEXT_DEMARCATIONTWO_CONNECTIONTABLE << endl;
-
-		// ConnectiontTable contents string
-		cout << _erModel->getConnectionTable();
-
-		// ConnectiontTable End
-		cout << TEXT_DEMARCATION_CONNECTIONTABLE << endl << endl;
-	}
+	cout << _presentationModel->displayConnectionTable_TextUI() << endl;
 }
 
 void TextUI::setPrimaryKey()
 {
 	string entityNodeID;
-	string attributeNodeIDSet;
 	vector<int> primaryKeys;
 
-	displayEntityTable();
+	cout << _presentationModel->displayEntityTable_TextUI() << endl;
 
 	// 輸入Entity
 	cout << TEXT_SETPRIMARYKEY_ENTERNODEID;
 	entityNodeID = searchEntity(PARAMETER_ENTITY);
 
 	// 顯示該Entity擁有的Attribute Component
-	cout << TEXT_SETPRIMARYKEY_ATTRIBUTEOFENTITY << entityNodeID << TEXT_SETPRIMARYKEY_ENDTEXT << endl;
-	displayAttributeTable(atoi(entityNodeID.c_str()));
-	cout << TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE;
+	cout << _presentationModel->displayAttributeTable_TextUI(atoi(entityNodeID.c_str())) << endl;
 	
 	// 輸入primary keys 並檢查正確
 	primaryKeys = searchAttribute(entityNodeID);
-	_erModel->setPrimaryKey(atoi(entityNodeID.c_str()), primaryKeys);
-	
-	// 顯示輸入的PK已經加入完成
-	for (int i = 0; i < primaryKeys.size(); i++)
-		attributeNodeIDSet += Toolkit::integerToString(primaryKeys[i]) + COMMA;
-	attributeNodeIDSet = attributeNodeIDSet.substr(0, PARAMETER_ADJUSTPKSHOWSTRINGDOUBLESIZE * primaryKeys.size() + PARAMETER_ADJUSTPKSHOWSTRINGSUBLAST);
 
-	cout << TEXT_NODENUMBEGIN << entityNodeID << TEXT_SETPRIMARYKEY_SETPKFINISH_ONE << attributeNodeIDSet << TEXT_SETPRIMARYKEY_SETPKFINISH_TWO << endl;
-}
-
-vector<int> TextUI::splitPrimaryKey( string primaryKeys )
-{
-	vector<string> splitText;
-	vector<int> primaryKeySet;
-
-	splitText = Toolkit::splitFunction(primaryKeys,COMMA);
-	
-	for (int i = 0; i < splitText.size(); i++)
-		primaryKeySet.push_back(atoi(splitText[i].c_str()));
-
-	return primaryKeySet;
-}
-
-void TextUI::displayEntityTable()
-{
-	// EntityTable表格樣式
-	cout << TEXT_SETPRIMARYKEY_ENTITYTITLE << endl;
-	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
-	cout << TEXT_COMPONENT_TABLEFORMAT << endl;
-	cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
-
-	// EntityTable內容
-	cout << _erModel->getComponentsTable(PARAMETER_ENTITY);
-
-	// ComponentTable結尾
-	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
-	
-}
-
-void TextUI::displayAttributeTable( int entityID )
-{
-	// AttributeTable表格樣式
-	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl;
-	cout << TEXT_COMPONENT_TABLEFORMAT << endl;
-	cout << TEXT_DEMARCATIONTWO_CONPONENTTABLE << endl;
-
-	//EntityTable內容
-	cout << _erModel->searchAttributeOfEntity(entityID);
-
-	// ComponentTable結尾
-	cout << TEXT_DEMARCATION_COMPONENTTABLE << endl << endl;
+	cout << _presentationModel->setPrimaryKeys_TextUI(atoi(entityNodeID.c_str()), primaryKeys) << endl;
 }
 
 void TextUI::displayERDiagramTable()
 {
-	if(_erModel->checkOneToOne())
-	{
-		// ERDiagramTable 表格樣式
-		cout << TEXT_DEMARCATION_ERDIAGRAMTABLE << endl;
-		cout << TEXT_ERDIAGRAM_TITLE << endl;
-		cout << TEXT_DEMARCATIONTWO_ERDIAGRAMTABLE << endl;
-
-		//ERDiagramTable內容
-		cout << _erModel->getERDiagramTable();
-
-		// ComponentTable 結尾
-		cout << TEXT_DEMARCATION_ERDIAGRAMTABLE << endl << endl;
-	}
-	else
-		cout << TEXT_ERDIAGRAM_NOTABLE << endl << endl;
+	cout << _presentationModel->displayERDiagramTable_TextUI() << endl;
 }
 
 void TextUI::exitERDiagram()
 {
 	string choice;
 
-	if (_erModel->getIsModify())
+	if (_presentationModel->getIsModify())
 	{
 		cout << TEXT_LOADSVAE_EXITPROGRAM << endl;
 		cout << TEXT_LOADSVAE_SAVEORNOT << endl;
@@ -303,7 +211,7 @@ void TextUI::saveERDiagram()
 	cout << TEXT_LOADSAVE_FILENAME;
 	cin >> fileName;
 
-	_erModel->saveERDiagram(fileName);
+	_presentationModel->saveERDiagram_TextUI(fileName);
 }
 
 void TextUI::loadERDiagram()
@@ -312,9 +220,7 @@ void TextUI::loadERDiagram()
 	cout << TEXT_LOADSAVE_FILENAME;
 	cin >> fileName;
 
-	cout << _erModel->loadERDiagram(fileName);
-	displayComponentTable();
-	displayConnectionTable();
+	cout << _presentationModel->loadERDiagram_TextUI(fileName) << endl;
 }
 
 void TextUI::deleteComponent()
@@ -322,37 +228,18 @@ void TextUI::deleteComponent()
 	string delComponentID;
 	cout << TEXT_DELETE_ENTERNODE;
 	delComponentID = searchComponent(PARAMETER_ALL);
-	_erModel->deleteCmd(atoi(delComponentID.c_str()));
 	
-	cout << TEXT_DELETE_DELETEFINISH_ONE << delComponentID << TEXT_DELETE_DELETEFINISH_TWO << endl;
-
-	displayComponentTable();
-	displayConnectionTable();
+	cout << _presentationModel->deleteComponent_TextUI(delComponentID) << endl;
 }
 
 void TextUI::undoCmd()
 {
-	if (_erModel->undoCmd())
-	{
-		cout << TEXT_UNDO_SUCCESS << endl;
-		displayComponentTable();
-		displayConnectionTable();
-	}
-	else
-		cout << TEXT_UNDO_FAILED << endl;
-	
+	cout << _presentationModel->undo_TextUI() << endl;
 }
 
 void TextUI::redoCmd()
 {
-	if(_erModel->redoCmd())
-	{
-		cout << TEXT_REDO_SUCCESS << endl;
-		displayComponentTable();
-		displayConnectionTable();
-	}
-	else
-		cout << TEXT_REDO_FAILED << endl;
+	cout << _presentationModel->redo_TextUI() << endl;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -362,62 +249,60 @@ void TextUI::redoCmd()
 string TextUI::searchComponent( string searchType )
 {
 	string searchID;
+	string result;
 
 	cin >> searchID;
-	while(!(_erModel->searchComponentExist(searchID, searchType))){
-		if (searchType == PARAMETER_ALL)
-			cout << TEXT_CONNECTION_ERRORNODE;
+
+	// 確認輸入的node是否正確
+	result = _presentationModel->searchComponent_TextUI(searchID, searchType);
+	while(result == TEXT_CONNECTION_ERRORNODE){
+		cout << result;
 		cin >> searchID;
+		result = _presentationModel->searchComponent_TextUI(searchID, searchType);
 	}
+
 	return searchID;
 }
 
 string TextUI::searchEntity( string searchType )
 {
-	string searchID;
+ 	string searchID;
+	string result;
 
-	cin >> searchID;
-	while(true){
-		if (!_erModel->searchComponentExist(searchID, PARAMETER_ALL))					// 輸入ID不存在
-			cout << TEXT_CONNECTION_ERRORNODE;
-		else if (_erModel->searchComponentExist(searchID, PARAMETER_ENTITY))			// 找到輸入的Entity
-			break;
-		else																			// 輸入的ID不是Entity
-			cout << TEXT_NODENUMBEGIN << searchID << TEXT_SETPRIMARYKEY_ERRORMESSAGE;
+ 	cin >> searchID;
+	result = _presentationModel->searchEntity_TextUI(searchID);
+	while(result == (TEXT_NODENUMBEGIN + searchID + TEXT_SETPRIMARYKEY_ERRORMESSAGE) || result == TEXT_CONNECTION_ERRORNODE)
+	{
+		cout << result;
 		cin >> searchID;
+		result = _presentationModel->searchEntity_TextUI(searchID);
 	}
-	return searchID;
+
+ 	return searchID;
 }
 
 vector<int> TextUI::searchAttribute( string entityNodeID )
 {
 	string attributeNodeID;
-	string errorMessage = PARAMETER_INITIALSEARCH;
-	vector<int> primaryKeys;
-	cin >> attributeNodeID;
-	primaryKeys = splitPrimaryKey(attributeNodeID);
+	string errorMessage = PARAMETER_NULL;
+ 	vector<int> primaryKeys;
 
-	while(true)
+	cout << TEXT_SETPRIMARYKEY_ENTERTWOATTRIBUTE;
+ 	cin >> attributeNodeID;
+ 	primaryKeys = _presentationModel->splitPrimaryKey(attributeNodeID);
+
+	errorMessage = _presentationModel->checkAttributeInEntity_TextUI(entityNodeID, primaryKeys);
+	while( errorMessage != PARAMETER_NULL)
 	{
-		//	errorMessage用來回報Primary Key的集合是否有問題
-		errorMessage = PARAMETER_NULL;
-		for (int i = 0; i < primaryKeys.size(); i++)
-		{
-			if (!_erModel->searchComponentExist(Toolkit::integerToString(primaryKeys[i]), PARAMETER_ALL))						//	輸入的ID不存在.
-				errorMessage += TEXT_CONNECTION_ERRORNODE;
-			else if (!_erModel->searchEntityConnection(atoi(entityNodeID.c_str()), primaryKeys[i], PARAMETER_ATTRIBUTE))		//	輸入的ID並非在該EntityNode中
-				errorMessage += TEXT_NODENUMBEGIN + Toolkit::integerToString(primaryKeys[i]) + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_ONE + entityNodeID + TEXT_SETPRIMARYKEY_ERRORATTRIBUTEID_TWO;
-		}
-		if (errorMessage != PARAMETER_NULL)
-			cout << errorMessage;
-		else								//	輸入的Primary Key的集合正確，跳出回傳結果
-			break;
+		// errorMessage用來回報Primary Key的集合是否有問題
+		cout << errorMessage;
 
 		//	重新輸入新的Primary Key
 		primaryKeys.clear();
 		cin >> attributeNodeID;
-		primaryKeys = splitPrimaryKey(attributeNodeID);
+		primaryKeys = _presentationModel->splitPrimaryKey(attributeNodeID);
+		errorMessage = _presentationModel->checkAttributeInEntity_TextUI(entityNodeID, primaryKeys);
 	}
 
-	return primaryKeys;
+ 	return primaryKeys;
 }

@@ -16,8 +16,6 @@
 #include <fstream>
 #include "ERModel.h"
 
-using namespace std;
-
 class ERModelTest : public :: testing :: Test
 {
 protected:

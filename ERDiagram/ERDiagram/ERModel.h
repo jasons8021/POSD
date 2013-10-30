@@ -135,17 +135,22 @@ class ERModel
 	friend class CommandManagerTest;
 	FRIEND_TEST(CommandManagerTest, execute);
 
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-	//FRIEND_TEST(ERModelTest, );
-
-
+	friend class PresentationModelTest;
+	FRIEND_TEST(PresentationModelTest, getConnectionTable);
+	FRIEND_TEST(PresentationModelTest, getConnectionTableSize);
+	FRIEND_TEST(PresentationModelTest, searchAttributeOfEntity);
+	FRIEND_TEST(PresentationModelTest, displayConnectionTable);
+	FRIEND_TEST(PresentationModelTest, displayComponentTable);
+	FRIEND_TEST(PresentationModelTest, displayAttributeTable);
+	FRIEND_TEST(PresentationModelTest, checkAttributeInEntity);
+	FRIEND_TEST(PresentationModelTest, setPrimaryKeys);
+ 	FRIEND_TEST(PresentationModelTest, displayERDiagramTable);
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
 public:
 	ERModel();
 	virtual ~ERModel();

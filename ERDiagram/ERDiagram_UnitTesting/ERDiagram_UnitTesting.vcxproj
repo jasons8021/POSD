@@ -97,6 +97,7 @@
     <ClCompile Include="..\ERDiagram\NodeAttribute.cpp" />
     <ClCompile Include="..\ERDiagram\NodeEntity.cpp" />
     <ClCompile Include="..\ERDiagram\NodeRelationship.cpp" />
+    <ClCompile Include="..\ERDiagram\PresentationModel.cpp" />
     <ClCompile Include="..\ERDiagram\TextUI.cpp" />
     <ClCompile Include="..\ERDiagram\Toolkit.cpp" />
     <ClCompile Include="AddComponentCmdTest.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="NodeAttributeTest.cpp" />
     <ClCompile Include="NodeEntityTest.cpp" />
     <ClCompile Include="NodeRelationshipTest.cpp" />
+    <ClCompile Include="PresentationModelTest.cpp" />
     <ClCompile Include="ToolkitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +129,7 @@
     <ClInclude Include="NodeAttributeTest.h" />
     <ClInclude Include="NodeEntityTest.h" />
     <ClInclude Include="NodeRelationshipTest.h" />
+    <ClInclude Include="PresentationModelTest.h" />
     <ClInclude Include="ToolkitTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -134,7 +137,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" QtVersion_x0020_Win32="4.8.5" />
+      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" QtVersion_x0020_Win32="4.8.3" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

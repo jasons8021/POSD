@@ -94,6 +94,7 @@
     <ClCompile Include="NodeAttribute.cpp" />
     <ClCompile Include="NodeEntity.cpp" />
     <ClCompile Include="NodeRelationship.cpp" />
+    <ClCompile Include="PresentationModel.cpp" />
     <ClCompile Include="TextUI.cpp" />
     <ClCompile Include="Toolkit.cpp" />
   </ItemGroup>
@@ -111,6 +112,7 @@
     <ClInclude Include="NodeAttribute.h" />
     <ClInclude Include="NodeEntity.h" />
     <ClInclude Include="NodeRelationship.h" />
+    <ClInclude Include="PresentationModel.h" />
     <ClInclude Include="TextUI.h" />
     <ClInclude Include="Toolkit.h" />
   </ItemGroup>
@@ -119,7 +121,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" QtVersion_x0020_Win32="4.8.5" />
+      <UserProperties UicDir=".\GeneratedFiles" MocDir=".\GeneratedFiles\$(ConfigurationName)" MocOptions="" RccDir=".\GeneratedFiles" lupdateOnBuild="0" lupdateOptions="" lreleaseOptions="" QtVersion_x0020_Win32="4.8.3" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

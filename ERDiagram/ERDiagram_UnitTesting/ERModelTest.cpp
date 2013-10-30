@@ -3,8 +3,6 @@
 void ERModelTest::SetUp()
 {
 	_erModel = new ERModel();
-	_erModel->setComponentID(0);
-	_erModel->setIsModify(false);
 
 	const int testNum = 10;
 	const string testType[testNum] = {"A", "E", "R", "A", "A", "A", "E", "R", "E", "E"};
@@ -32,7 +30,8 @@ void ERModelTest::TearDown()
 	_rmdir("CreatPathTest");
 }
 
-TEST_F(ERModelTest, addNode){
+TEST_F(ERModelTest, addNode)
+{
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
 	EXPECT_EQ(0, _erModel->_components.size());
@@ -50,8 +49,8 @@ TEST_F(ERModelTest, addNode){
 	EXPECT_EQ(PARAMETER_ISERROR, _erModel->addNode(6,testType[6],testText[6]));
 }
 
-TEST_F(ERModelTest, addConnection){
-
+TEST_F(ERModelTest, addConnection)
+{
 	// Attribute和Entity相連
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, "Connection0,1"));
  	EXPECT_EQ(11, _erModel->addConnection(11, 5, 6, "Connection5,6"));
@@ -84,8 +83,8 @@ TEST_F(ERModelTest, addConnection){
 	EXPECT_EQ(PARAMETER_ISERROR, _erModel->addConnection(14, 2, 7, "Connection2,7"));
 }
 
-TEST_F(ERModelTest, checkConnectionState){
-
+TEST_F(ERModelTest, checkConnectionState)
+{
 	EXPECT_EQ("CANCONNECT", _erModel->checkConnectionState(_erModel->_components[1], _erModel->_components[0]));
 	EXPECT_EQ("CANCONNECT", _erModel->checkConnectionState(_erModel->_components[1], _erModel->_components[2]));
 	EXPECT_EQ("CANCONNECT", _erModel->checkConnectionState(_erModel->_components[5], _erModel->_components[6]));
@@ -119,7 +118,8 @@ TEST_F(ERModelTest, checkConnectionState){
 	EXPECT_EQ("The node '8' cannot be connected by the node '3'.", _erModel->checkConnectionState(_erModel->_components[3], _erModel->_components[8]));
 }
 
-TEST_F(ERModelTest, getCheckConnectionStateMessage){
+TEST_F(ERModelTest, getCheckConnectionStateMessage)
+{
 	EXPECT_EQ("CANCONNECT", _erModel->getCheckConnectionStateMessage(1, 0));
 	EXPECT_EQ("CANCONNECT", _erModel->getCheckConnectionStateMessage(1, 2));
 	EXPECT_EQ("CANCONNECT", _erModel->getCheckConnectionStateMessage(5, 6));
@@ -153,7 +153,8 @@ TEST_F(ERModelTest, getCheckConnectionStateMessage){
 	EXPECT_EQ("The node '8' cannot be connected by the node '3'.", _erModel->getCheckConnectionStateMessage(3, 8));
 }
 
-TEST_F(ERModelTest, checkSetCardinality){
+TEST_F(ERModelTest, checkSetCardinality)
+{
 	// E-R 或 R-E
 	EXPECT_TRUE(_erModel->checkSetCardinality(1, 2));
 	EXPECT_TRUE(_erModel->checkSetCardinality(2, 1));
@@ -169,7 +170,8 @@ TEST_F(ERModelTest, checkSetCardinality){
 	EXPECT_FALSE(_erModel->checkSetCardinality(3, 5));
 }
 
-TEST_F(ERModelTest, setCardinality){
+TEST_F(ERModelTest, setCardinality)
+{
 	// 一開始空的
 	EXPECT_TRUE(static_cast<NodeRelationship*>(_erModel->_components[2])->getEntityCardinality().empty());
 	//	E-R, 在R中設定EntityCardinality
@@ -188,7 +190,8 @@ TEST_F(ERModelTest, setCardinality){
 
 }
 
-TEST_F(ERModelTest, getComponentsTable){
+TEST_F(ERModelTest, getComponentsTable)
+{
 	string allTypeResult = "  A   |  0   |  A0\n";
 	allTypeResult += "  E   |  1   |  E1\n";
 	allTypeResult += "  R   |  2   |  R2\n";
@@ -227,7 +230,8 @@ TEST_F(ERModelTest, getComponentsTable){
 	EXPECT_EQ(PARAMETER_NULL, _erModel->getComponentsTable(PARAMETER_ALL));
 }
 
-TEST_F(ERModelTest, getConnectionTable){
+TEST_F(ERModelTest, getConnectionTable)
+{
 	// 一開始connections是空的沒東西，用來判斷大小為0的情況
 	EXPECT_EQ(PARAMETER_NULL, _erModel->getConnectionTable());
 	
@@ -249,7 +253,8 @@ TEST_F(ERModelTest, getConnectionTable){
 	EXPECT_EQ(resultFourConnection, _erModel->getConnectionTable());
 }
 
-TEST_F(ERModelTest, setPrimaryKey){
+TEST_F(ERModelTest, setPrimaryKey)
+{
 	vector<int> primaryKeys;
 
 	// 測試PK沒有設的情況
@@ -276,7 +281,8 @@ TEST_F(ERModelTest, setPrimaryKey){
 	EXPECT_EQ(4, static_cast<NodeEntity*>(_erModel->_components[6])->getPrimaryKey().size());
 }
 
-TEST_F(ERModelTest, reBuildPrimaryKeyFromAttribute){
+TEST_F(ERModelTest, reBuildPrimaryKeyFromAttribute)
+{
 	// 起始無東西，用來確認加入後是否有改變
 	EXPECT_FALSE(static_cast<NodeAttribute*>(_erModel->_components[0])->getIsPrimaryKey());
 	EXPECT_FALSE(static_cast<NodeAttribute*>(_erModel->_components[3])->getIsPrimaryKey());
@@ -294,7 +300,8 @@ TEST_F(ERModelTest, reBuildPrimaryKeyFromAttribute){
 
 }
 
-TEST_F(ERModelTest, searchAttributeOfEntity){
+TEST_F(ERModelTest, searchAttributeOfEntity)
+{
 	// 起始空的
 	EXPECT_EQ(PARAMETER_NULL, _erModel->searchAttributeOfEntity(1));
 
@@ -310,7 +317,8 @@ TEST_F(ERModelTest, searchAttributeOfEntity){
 	EXPECT_EQ(result, _erModel->searchAttributeOfEntity(6));
 }
 
-TEST_F(ERModelTest, searchEntityConnection){
+TEST_F(ERModelTest, searchEntityConnection)
+{
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 6, "Connection0,6"));
 	EXPECT_EQ(11, _erModel->addConnection(11, 3, 6, "Connection3,6"));
 	EXPECT_EQ(12, _erModel->addConnection(12, 4, 6, "Connection4,6"));
@@ -325,7 +333,8 @@ TEST_F(ERModelTest, searchEntityConnection){
 
 }
 
-TEST_F(ERModelTest, getERDiagramTable){
+TEST_F(ERModelTest, getERDiagramTable)
+{
 	vector<int> primaryKeys;
 	string result = " E1       |  PK(A5), FK(A0, A4)\n E6       |  PK(A0, A4), A3\n E8       |  \n E9       |  \n";
 
@@ -353,7 +362,8 @@ TEST_F(ERModelTest, getERDiagramTable){
 	EXPECT_EQ(result, _erModel->getERDiagramTable());
 }
 
-TEST_F(ERModelTest, getAttributeContents){
+TEST_F(ERModelTest, getAttributeContents)
+{
 	vector<Component*> testAttributeComponents;
 	vector<int> primaryKeys;
 
@@ -384,7 +394,8 @@ TEST_F(ERModelTest, getAttributeContents){
 	EXPECT_EQ("A5", _erModel->getAttributeContents(testAttributeComponents));
 }
 
-TEST_F(ERModelTest, setForeignKey){
+TEST_F(ERModelTest, setForeignKey)
+{
 	vector<int> primaryKeys;
 	
 	// A-E
@@ -431,7 +442,8 @@ TEST_F(ERModelTest, setForeignKey){
 	EXPECT_EQ(1, static_cast<NodeEntity*>(_erModel->_components[9])->getForeignKey().size());
 }
 
-TEST_F(ERModelTest, oneToOne){
+TEST_F(ERModelTest, oneToOne)
+{
 	// 一開始Entity都沒跟Relationship相連，因此用來測試沒有的情況
 	EXPECT_EQ(0, _erModel->oneToOne(static_cast<NodeRelationship*>(_erModel->_components[2])).size());
 
@@ -465,7 +477,8 @@ TEST_F(ERModelTest, oneToOne){
 	EXPECT_EQ(0, _erModel->oneToOne(static_cast<NodeRelationship*>(_erModel->_components[21])).size());
 }
 
-TEST_F(ERModelTest, checkOneToOne){
+TEST_F(ERModelTest, checkOneToOne)
+{
 	// 一開始Entity都沒跟Relationship相連，因此用來測試沒有的情況
 	EXPECT_FALSE(_erModel->checkOneToOne());
 
@@ -499,7 +512,8 @@ TEST_F(ERModelTest, checkOneToOne){
 	
 }
 
-TEST_F(ERModelTest, searchForeignKey){
+TEST_F(ERModelTest, searchForeignKey)
+{
 	vector<int> primaryKeys;
 
 	// A-E
@@ -553,7 +567,8 @@ TEST_F(ERModelTest, searchForeignKey){
 
 }
 
-TEST_F(ERModelTest, loadERDiagram){
+TEST_F(ERModelTest, loadERDiagram)
+{
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
 	while(_erModel->_components.size() > 0)
 		_erModel->_components.pop_back();
@@ -568,7 +583,8 @@ TEST_F(ERModelTest, loadERDiagram){
 	EXPECT_FALSE(_erModel->_components.empty());
 }
 
-TEST_F(ERModelTest, classifyInputFile){
+TEST_F(ERModelTest, classifyInputFile)
+{
 	vector<vector<string>> resultSet = _erModel->classifyInputFile("E, Engineer\nA, Emp_ID\nR, Has\nA, Name\nC\nC\n\n4 0,1\n5 0,3\n\n0 1,3");
 	vector<string> resultComponentSet, resultConnectionSet, resultPrimaryKeysSet;
 	string testComponentString, testConnectionString, testPrimaryKeysString;
@@ -601,7 +617,8 @@ TEST_F(ERModelTest, classifyInputFile){
 	EXPECT_EQ("0 1,3\n",testPrimaryKeysString);
 }
 
-TEST_F(ERModelTest, recoveryFile){
+TEST_F(ERModelTest, recoveryFile)
+{
 	vector<vector<string>> resultSet;
 
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
@@ -623,7 +640,8 @@ TEST_F(ERModelTest, recoveryFile){
 	EXPECT_TRUE(static_cast<NodeAttribute*>(_erModel->_components[3])->getIsPrimaryKey());
 }
 
-TEST_F(ERModelTest, recoveryAllComponent){
+TEST_F(ERModelTest, recoveryAllComponent)
+{
 	vector<string> testComponentSet;
 	vector<string> testConnectionSet;
 
@@ -654,7 +672,8 @@ TEST_F(ERModelTest, recoveryAllComponent){
 	EXPECT_EQ(3, _erModel->_connections.size());
 }
 
-TEST_F(ERModelTest, recoveryConnection){
+TEST_F(ERModelTest, recoveryConnection)
+{
 	int connectionSetCount = 0;
 	vector<string> testConnectionSet;
 
@@ -694,7 +713,8 @@ TEST_F(ERModelTest, recoveryConnection){
 	EXPECT_EQ("1", _erModel->_components[6]->getText());
 }
 
-TEST_F(ERModelTest, recoveryPrimaryKey){
+TEST_F(ERModelTest, recoveryPrimaryKey)
+{
 	vector<string> testPrimaryKeysSet;
 
 	// 清空ERModel中的components，用來確認之後是否有恢復檔案
@@ -717,7 +737,8 @@ TEST_F(ERModelTest, recoveryPrimaryKey){
 	EXPECT_TRUE(static_cast<NodeAttribute*>(_erModel->_components[3])->getIsPrimaryKey());
 }
 
-TEST_F(ERModelTest, splitter){
+TEST_F(ERModelTest, splitter)
+{
 	string testPKString = "0 1,3,4,5";
 	string testConnectionString = "7 9,10";
 	pair<string,vector<string>> result_PK, result_Connection;
@@ -749,7 +770,8 @@ TEST_F(ERModelTest, splitter){
 
 }
 
-TEST_F(ERModelTest, saveERDiagram){
+TEST_F(ERModelTest, saveERDiagram)
+{
 	vector<int> primaryKeys;
 	ifstream inputERDiagramTestFile;
 
@@ -784,7 +806,8 @@ TEST_F(ERModelTest, saveERDiagram){
 
 }
 
-TEST_F(ERModelTest, creatFilePath){
+TEST_F(ERModelTest, creatFilePath)
+{
 	ofstream saveCreatPathTestFile;
 	saveCreatPathTestFile.open(".\\CreatPathTest\\CreatPathTestFile.txt");
 
@@ -793,7 +816,8 @@ TEST_F(ERModelTest, creatFilePath){
 	EXPECT_TRUE(saveCreatPathTestFile.is_open());
 }
 
-TEST_F(ERModelTest, saveComponentTable){
+TEST_F(ERModelTest, saveComponentTable)
+{
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
 	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
 	EXPECT_EQ("A, A0\nE, E1\nR, R2\nA, A3\nA, A4\nA, A5\nE, E6\nR, R7\nE, E8\nE, E9\nC\nC\n",_erModel->saveComponentTable());
@@ -802,7 +826,8 @@ TEST_F(ERModelTest, saveComponentTable){
 	EXPECT_EQ("A, A0\nE, E1\nR, R2\nA, A3\nA, A4\nA, A5\nE, E6\nR, R7\nE, E8\nE, E9\nC\nC\nC, 1\n",_erModel->saveComponentTable());
 }
 
-TEST_F(ERModelTest, saveConnectionTable){
+TEST_F(ERModelTest, saveConnectionTable)
+{
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
 	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
 	EXPECT_EQ("10 0,1\n11 1,3\n",_erModel->saveConnectionTable());
@@ -811,7 +836,8 @@ TEST_F(ERModelTest, saveConnectionTable){
 	EXPECT_EQ("10 0,1\n11 1,3\n12 1,2\n",_erModel->saveConnectionTable());
 }
 
-TEST_F(ERModelTest, savePrimaryKeyTable){
+TEST_F(ERModelTest, savePrimaryKeyTable)
+{
 	vector<int> primaryKeys;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -837,7 +863,8 @@ TEST_F(ERModelTest, savePrimaryKeyTable){
 	EXPECT_EQ("1 0,3,4\n\n8 5\n\n", _erModel->savePrimaryKeyTable());
 }
 
-TEST_F(ERModelTest, deleteFunction){
+TEST_F(ERModelTest, deleteFunction)
+{
 	bool checkDeleteResult = false;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -874,7 +901,8 @@ TEST_F(ERModelTest, deleteFunction){
 	EXPECT_TRUE(checkDeleteResult);
 }
 
-TEST_F(ERModelTest, deleteComponent){
+TEST_F(ERModelTest, deleteComponent)
+{
 	bool checkDeleteResult = false;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -925,7 +953,8 @@ TEST_F(ERModelTest, deleteComponent){
 	EXPECT_TRUE(checkDeleteResult);
 }
 
-TEST_F(ERModelTest, deleteConnection){
+TEST_F(ERModelTest, deleteConnection)
+{
 	bool checkDeleteResult = false;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -976,7 +1005,8 @@ TEST_F(ERModelTest, deleteConnection){
 	EXPECT_TRUE(checkDeleteResult);
 }
 
-TEST_F(ERModelTest, deleteTableSet){
+TEST_F(ERModelTest, deleteTableSet)
+{
 	bool checkDeleteResult = false;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -1015,7 +1045,8 @@ TEST_F(ERModelTest, deleteTableSet){
 	EXPECT_TRUE(checkDeleteResult);
 }
 
-TEST_F(ERModelTest, addNodeCmd){
+TEST_F(ERModelTest, addNodeCmd)
+{
 	bool checkResult = false;
 
 	_erModel->addNodeCmd("A", "CmdA10");
@@ -1028,7 +1059,8 @@ TEST_F(ERModelTest, addNodeCmd){
 	EXPECT_TRUE(checkResult);
 }
 
-TEST_F(ERModelTest, addConnectionCmd){
+TEST_F(ERModelTest, addConnectionCmd)
+{
 	bool checkResult = false;
 
 	_erModel->addConnectionCmd(0, 1, PARAMETER_NULL);
@@ -1050,7 +1082,8 @@ TEST_F(ERModelTest, addConnectionCmd){
 	EXPECT_TRUE(checkResult);
 }
 
-TEST_F(ERModelTest, deleteCmd){
+TEST_F(ERModelTest, deleteCmd)
+{
 	bool checkDeleteResult = false;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -1101,7 +1134,8 @@ TEST_F(ERModelTest, deleteCmd){
 	EXPECT_TRUE(checkDeleteResult);
 }
 
-TEST_F(ERModelTest, undoCmd){
+TEST_F(ERModelTest, undoCmd)
+{
 	bool checkResult = false;
 
 	// 還沒有用Command，所以不能undo
@@ -1218,7 +1252,8 @@ TEST_F(ERModelTest, undoCmd){
 	checkResult = false;
 }
 
-TEST_F(ERModelTest, redoCmd){
+TEST_F(ERModelTest, redoCmd)
+{
 	bool checkResult = false;
 
 	//
@@ -1305,12 +1340,14 @@ TEST_F(ERModelTest, redoCmd){
 	checkResult = false;
 }
 
-TEST_F(ERModelTest, searchComponent){
+TEST_F(ERModelTest, searchComponent)
+{
 	EXPECT_EQ(_erModel->_components[0]->getText(), _erModel->searchComponent(0)->getText());
 	EXPECT_EQ(NULL, _erModel->searchComponent(10));
 }
 
-TEST_F(ERModelTest, searchComponentConnection){
+TEST_F(ERModelTest, searchComponentConnection)
+{
 	_erModel->addConnectionCmd(1, 2, "N");
 	EXPECT_TRUE(_erModel->searchComponentConnection(1, PARAMETER_ENTITY, _erModel->_components[2]->getConnections()));
 	EXPECT_FALSE(_erModel->searchComponentConnection(1, PARAMETER_ATTRIBUTE, _erModel->_components[2]->getConnections()));
@@ -1318,14 +1355,16 @@ TEST_F(ERModelTest, searchComponentConnection){
 	EXPECT_TRUE(_erModel->searchComponentConnection(2, PARAMETER_RELATIONSHIP, _erModel->_components[1]->getConnections()));
 }
 
-TEST_F(ERModelTest, searchComponentExist){
+TEST_F(ERModelTest, searchComponentExist)
+{
 	EXPECT_TRUE(_erModel->searchComponentExist("0", PARAMETER_ATTRIBUTE));
 	EXPECT_FALSE(_erModel->searchComponentExist("10", PARAMETER_ATTRIBUTE));
 	EXPECT_FALSE(_erModel->searchComponentExist("0", PARAMETER_ENTITY));
 	EXPECT_FALSE(_erModel->searchComponentExist("0", PARAMETER_RELATIONSHIP));
 }
 
-TEST_F(ERModelTest, searchSpecificTypeComponentSet){
+TEST_F(ERModelTest, searchSpecificTypeComponentSet)
+{
 	vector<Component*> testAttributeSet;
 	vector<Component*> testEntitySet;
 	vector<Component*> testRelationshipSet;
@@ -1353,7 +1392,8 @@ TEST_F(ERModelTest, searchSpecificTypeComponentSet){
 	EXPECT_EQ(testConnectorSet, _erModel->searchSpecificTypeComponentSet(PARAMETER_CONNECTOR, _erModel->_components));
 }
 
-TEST_F(ERModelTest, getComponentDataList){
+TEST_F(ERModelTest, getComponentDataList)
+{
 	string allTypeResult = "  A   |  0   |  A0\n";
 	allTypeResult += "  E   |  1   |  E1\n";
 	allTypeResult += "  R   |  2   |  R2\n";
@@ -1392,7 +1432,8 @@ TEST_F(ERModelTest, getComponentDataList){
 	EXPECT_EQ(PARAMETER_NULL, _erModel->getComponentDataList(PARAMETER_ALL, _erModel->_components));
 }
 
-TEST_F(ERModelTest, searchConnection){
+TEST_F(ERModelTest, searchConnection)
+{
 	vector<Component*> testRelatedConnectionSet;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -1404,7 +1445,8 @@ TEST_F(ERModelTest, searchConnection){
 	EXPECT_EQ(testRelatedConnectionSet, _erModel->searchConnection(1));
 }
 
-TEST_F(ERModelTest, searchRelatedComponent){
+TEST_F(ERModelTest, searchRelatedComponent)
+{
 	vector<Component*> testRelatedComponentSet;
 
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
@@ -1416,7 +1458,8 @@ TEST_F(ERModelTest, searchRelatedComponent){
 	EXPECT_EQ(testRelatedComponentSet, _erModel->searchRelatedComponent(1));
 }
 
-TEST_F(ERModelTest, resetERModel){
+TEST_F(ERModelTest, resetERModel)
+{
 	EXPECT_EQ(10, _erModel->addConnection(10, 0, 1, PARAMETER_NULL));
 	EXPECT_EQ(11, _erModel->addConnection(11, 1, 3, PARAMETER_NULL));
 
@@ -1426,7 +1469,8 @@ TEST_F(ERModelTest, resetERModel){
 	EXPECT_EQ(0,_erModel->_componentID);
 }
 
-TEST_F(ERModelTest, sortCompoentsAndConnection){
+TEST_F(ERModelTest, sortCompoentsAndConnection)
+{
 	const string testSortComponentsTextSet[6] = {"A0", "E1", "R2", "A3", "A4", "A5"};
 	const string testNotSortComponentsTextSet[6] = {"E1", "A0", "A3", "A5", "A4", "R2"};
 

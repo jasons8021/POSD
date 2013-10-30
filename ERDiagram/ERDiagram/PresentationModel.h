@@ -1,15 +1,5 @@
-#ifndef TEXTUI_H_
-#define TEXTUI_H_
-
-// Menu text set.
-#define TEXT_MENU "1.  Load ER diagram file\n2.  Save ER diagram file\n3.  Add a node\n4.  Connect two nodes\n5.  Display the current diagram\n6.  Set a primary key\n7.  Display the table\n8.  Delete a component\n9.  Undo\n10. Redo\n11. Exit\n> "
-#define TEXT_MENU_ERRORCHOICE "You entered a invalid number. Please enter a valid number again.\n> "
-
-// General text set
-#define TEXT_NODENUMBEGIN "The node '"
-#define TEXT_ENDTEXT "'."
-#define TEXT_COMPONENT_TABLEFORMAT " TYPE |  ID  |  NAME"
-#define TEXT_CONNECTION_TABLEFORMAT "Connection | node | node |"
+#ifndef PRESENTATIONMODEL_H_
+#define PRESENTATIONMODEL_H_
 
 // Choice 1. Add new node text set. They make use of onShow.
 #define TEXT_ADDNEWNODE_TYPE "What kind of node do you want to add?\n[A]Attribute [E]Entity [R]Relation\n> "
@@ -49,13 +39,11 @@
 #define TEXT_ERDIAGRAM_TITLE " Entity   |  Attribute"
 #define TEXT_ERDIAGRAM_NOTABLE "It has no table to display."
 
-// Choice 6. GoodBye
-#define TEXT_GOODBYE "Goodbye!"
-
 // Choice 7. Load/Save ERDiagram
 #define TEXT_LOADSAVE_FILENAME "Please input the file name: "
 #define TEXT_LOADSVAE_EXITPROGRAM "You have modified the ERDiagram. Do you want to save ?"
 #define TEXT_LOADSVAE_SAVEORNOT "[0]Yes [1]No"
+#define TEXT_LOADSAVE_OPENFAILED "File not found!!\n"
 
 // Choice 8. Delete
 #define TEXT_DELETE_ENTERNODE "Please enter the component ID\n> "
@@ -68,6 +56,12 @@
 #define TEXT_UNDO_FAILED "Undo failed"
 #define TEXT_REDO_FAILED "Redo failed"
 
+// General text set
+#define TEXT_NODENUMBEGIN "The node '"
+#define TEXT_ENDTEXT "'."
+#define TEXT_COMPONENT_TABLEFORMAT " TYPE |  ID  |  NAME"
+#define TEXT_CONNECTION_TABLEFORMAT "Connection | node | node |"
+
 // Demarcation text set. They make use of onShow.
 #define TEXT_DEMARCATION_COMPONENTTABLE "------------------------------------"
 #define TEXT_DEMARCATION_CONNECTIONTABLE "--------------------------"
@@ -78,66 +72,63 @@
 #define TEXT_TWOSPACE "  "
 #define TEXT_FIVESPACE "     "
 #define TEXT_SPACELINE "   |"
+#define TEXT_ENDLINE "\n"
 
 // Parameter text set. They are parameters in some method.
-#define PARAMETER_ATTRIBUTE "A"
-#define PARAMETER_ENTITY "E"
-#define PARAMETER_RELATIONSHIP "R"
-#define PARAMETER_ALL "ALLTYPE"
-#define PARAMETER_CARDINALITYOPTION_ONE "1"
-#define PARAMETER_CARDINALITYOPTION_TWO "N"
-#define PARAMETER_INITIALSEARCH "initial search"
 #define PARAMETER_ADJUSTPKSHOWSTRINGDOUBLESIZE 2
 #define PARAMETER_ADJUSTPKSHOWSTRINGSUBLAST -1
-#define PARAMETER_ZEROCOMPONENT 0
-#define PARAMETER_SAVEEXIT 0
-#define PARAMETER_NOSAVEEXIT 1
-
-#define COMMA ","
-#define GETINPUT "> "
 
 #include <iostream>
-#include <sstream>
+#include <fstream>
 #include <string>
+#include <sstream>
+#include <vector>
+#include <gtest/gtest_prod.h>
 #include "ERModel.h"
-#include "Component.h"
-#include "Connector.h"
 #include "Toolkit.h"
-#include "PresentationModel.h"
 
-using namespace std;
-
-enum Option{Load = 1, Save, Add, Connect, GetTable, SetPK, GetERTable, Delete, Undo, Redo, Exit};
-enum Cardinality{CardinalityOptionOne, CardinalityOptionTwo};
-
-class TextUI
+class PresentationModel
 {
+	friend class PresentationModelTest;
+	FRIEND_TEST(PresentationModelTest, getConnectionTable);
+	FRIEND_TEST(PresentationModelTest, getConnectionTableSize);
+	FRIEND_TEST(PresentationModelTest, searchAttributeOfEntity);
+	FRIEND_TEST(PresentationModelTest, displayComponentTable_TextUI);
+	FRIEND_TEST(PresentationModelTest, displayConnectionTable_TextUI);
+	FRIEND_TEST(PresentationModelTest, displayAttributeTable_TextUI);
+	FRIEND_TEST(PresentationModelTest, checkAttributeInEntity_TextUI);
+	FRIEND_TEST(PresentationModelTest, setPrimaryKeys_TextUI);
+ 	FRIEND_TEST(PresentationModelTest, displayERDiagramTable_TextUI);
+ 	FRIEND_TEST(PresentationModelTest, deleteComponent);
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
+// 	FRIEND_TEST(PresentationModelTest, );
 public:
-	TextUI(PresentationModel*);
-	virtual ~TextUI();
-	void addNewNode();
-	void addConnection();
-	void setPrimaryKey();
-	void displayMenu();
-	void displayComponentTable();
-	void displayConnectionTable();
-	void displayERDiagramTable();
-	void processCommand();
-	void exitERDiagram();
-	void loadERDiagram();
-	void saveERDiagram();
-	void deleteComponent();
-	void undoCmd();
-	void redoCmd();
-	string chooseCardinality();
-	string searchComponent(string);
-	string searchEntity(string);
-	vector<int> searchAttribute(string);
+	PresentationModel(ERModel*);
+	virtual ~PresentationModel();
+	int getComponentTableSize();
+	int getConnectionTableSize();
+	bool addNodeCmd(string, string);
+	bool checkSetCardinality(int, int);
+	bool getIsModify();
+	void saveERDiagram_TextUI(string);
+	string addConnectionCmd(int, int, string);
+	string displayComponentTable_TextUI();
+	string displayConnectionTable_TextUI();
+	string searchComponent_TextUI(string, string);
+	string searchEntity_TextUI(string);
+	string displayEntityTable_TextUI();
+	string displayAttributeTable_TextUI(int);
+	string checkAttributeInEntity_TextUI(string, vector<int>);
+	string setPrimaryKeys_TextUI(int, vector<int>);
+	string displayERDiagramTable_TextUI();
+	string loadERDiagram_TextUI(string);
+	string deleteComponent_TextUI(string);
+	string undo_TextUI();
+	string redo_TextUI();
+	vector<int> splitPrimaryKey(string);
 private:
-	// ERModel* _erModel;
-	PresentationModel* _presentationModel;
-	bool _isDisplayComponentsTable;
-	bool _isDisplayConnectionsTable;
+	ERModel* _erModel;
 };
 
 #endif
