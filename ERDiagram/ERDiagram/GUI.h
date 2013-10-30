@@ -6,6 +6,7 @@
 #include <QtGui>
 #include <QLabel>
 #include <QFileDialog>
+#include <QWidget>
 #include "ERDiagramMessageBoxManager.h"
 #include "ERDiagramScene.h"
 #include "PresentationModel.h"

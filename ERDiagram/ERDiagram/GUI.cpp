@@ -19,25 +19,24 @@ GUI::GUI(PresentationModel* presentationModel)
 	setCentralWidget(widget);
 }
 
-
-GUI::~GUI(void)
+GUI::~GUI()
 {
 }
 
 void GUI::createActions()
 {
-	openAction = new QAction(QIcon("images/folder.png"), tr("O&pen..."), this);
+	openAction = new QAction(QIcon("images/openFile.png"), tr("O&pen..."), this);
 	openAction->setShortcut(tr("Ctrl+O"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(browse()));
 
 	exitAction = new QAction(QIcon("images/exit.png"), tr("E&xit"), this);
-	exitAction->setShortcut(tr("Ctrl+X"));
+	exitAction->setShortcut(tr("Alt+F4"));
 	connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
 }
 
 void GUI::createMenus()
 {
-	fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu = menuBar()->addMenu(tr("&File","&Exit"));
 	fileMenu->addAction(openAction);
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAction);
