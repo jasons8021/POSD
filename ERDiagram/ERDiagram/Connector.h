@@ -1,6 +1,8 @@
 #ifndef CONNECTOR_H_
 #define CONNECTOR_H_
 
+#define TEXT_ERRORCONNECT "Connector can't connect to each other."
+
 #define PARAMETER_CONNECTOR "C"
 #define PARAMETER_NULL ""
 

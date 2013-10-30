@@ -61,6 +61,16 @@
     <Filter Include="Source Files\Toolkit">
       <UniqueIdentifier>{63facceb-f5ff-4bc8-bb0c-a13db6951029}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{595d69b4-4b16-4bec-a696-9e419ceb0534}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{a6069e37-6f4e-4015-88fd-21603b8bf4d3}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -114,6 +124,27 @@
     <ClCompile Include="Toolkit.cpp">
       <Filter>Source Files\Toolkit</Filter>
     </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files\MVC\View</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_GUI.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_GUI.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ERDiagramScene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ERDiagramScene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ERDiagramScene.cpp">
+      <Filter>Source Files\MVC\View</Filter>
+    </ClCompile>
+    <ClCompile Include="ERDiagramMessageBoxManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddComponentCmd.h">
@@ -164,5 +195,16 @@
     <ClInclude Include="Toolkit.h">
       <Filter>Header Files\Toolkit</Filter>
     </ClInclude>
+    <ClInclude Include="ERDiagramMessageBoxManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="GUI.h">
+      <Filter>Header Files\MVC\View</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ERDiagramScene.h">
+      <Filter>Header Files\MVC\View</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

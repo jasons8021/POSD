@@ -15,7 +15,7 @@ void Connector::connectTo( Component* )
 
 string Connector::canConnectTo( Component* )
 {
-	return PARAMETER_NULL;
+	return TEXT_ERRORCONNECT;
 }
 
 void Connector::setSourceNode( Component* sourceNode )
