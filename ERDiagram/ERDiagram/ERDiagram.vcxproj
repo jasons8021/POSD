@@ -81,10 +81,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AddComponentCmd.cpp" />
+    <ClCompile Include="AttributeItem.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommandManager.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
+    <ClCompile Include="ComponentItem.cpp" />
     <ClCompile Include="ConnectComponentsCmd.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="DeleteComponentCmd.cpp" />
@@ -116,10 +118,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddComponentCmd.h" />
+    <ClInclude Include="AttributeItem.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandManager.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />
+    <ClInclude Include="ComponentItem.h" />
     <ClInclude Include="ConnectComponentsCmd.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="DeleteComponentCmd.h" />

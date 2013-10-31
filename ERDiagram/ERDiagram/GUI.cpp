@@ -11,9 +11,14 @@ GUI::GUI(PresentationModel* presentationModel)
 
 	_entityItem = new EntityItem();
 	_entityItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-	//_entityItem->setAcceptsHoverEvents(true);
+	_entityItem->setAcceptsHoverEvents(true);
 	_entityItem->translate(2000, 1500);
 	_scene->addItem(_entityItem);
+
+	_attributeItem = new AttributeItem();
+	_attributeItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+	_attributeItem->translate(2000, 1500);
+	_scene->addItem(_attributeItem);
 
 	QHBoxLayout *layout = new QHBoxLayout;
 	_view = new QGraphicsView(_scene);

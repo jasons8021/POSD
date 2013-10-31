@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include "EntityItem.h"
+#include "ComponentItem.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;

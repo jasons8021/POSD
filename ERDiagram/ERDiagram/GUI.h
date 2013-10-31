@@ -12,6 +12,7 @@
 #include "ERDiagramScene.h"
 #include "PresentationModel.h"
 #include "EntityItem.h"
+#include "AttributeItem.h"
 
 QT_BEGIN_NAMESPACE
 class DiagramScene;
@@ -44,7 +45,9 @@ private:
 	QAction* _exitAction;
 	QAction* _openAction;
 
+	// Item
 	EntityItem* _entityItem;
+	AttributeItem* _attributeItem;
 
 	PresentationModel* _presentationModel;
 };

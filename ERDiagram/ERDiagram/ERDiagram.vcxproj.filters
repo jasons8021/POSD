@@ -71,6 +71,12 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\MVC\View\GUI Item">
+      <UniqueIdentifier>{ef880854-d09a-40bc-a943-3e68a65b818b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MVC\View\GUI Item">
+      <UniqueIdentifier>{0218c9c6-f37f-4787-91d2-1f88c9defe65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -146,6 +152,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntityItem.cpp">
+      <Filter>Source Files\MVC\View\GUI Item</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentItem.cpp">
+      <Filter>Source Files\MVC\View\GUI Item</Filter>
+    </ClCompile>
+    <ClCompile Include="AttributeItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -202,6 +214,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityItem.h">
+      <Filter>Header Files\MVC\View\GUI Item</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentItem.h">
+      <Filter>Header Files\MVC\View\GUI Item</Filter>
+    </ClInclude>
+    <ClInclude Include="AttributeItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
