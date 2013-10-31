@@ -2,6 +2,7 @@
 #define ERDIAGRAMSCENE_H_
 
 #include <QGraphicsScene>
+#include "EntityItem.h"
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;

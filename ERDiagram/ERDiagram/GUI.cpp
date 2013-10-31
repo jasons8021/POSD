@@ -6,12 +6,18 @@ GUI::GUI(PresentationModel* presentationModel)
 	createActions();
 	createMenus();
 	createToolbars();
-	scene = new ERDiagramScene(this);
-	scene->setSceneRect(QRectF(0, 0, 4000, 3000));
+	_scene = new ERDiagramScene(this);
+	_scene->setSceneRect(QRectF(0, 0, 4000, 3000));
+
+	_entityItem = new EntityItem();
+	_entityItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+	//_entityItem->setAcceptsHoverEvents(true);
+	_entityItem->translate(2000, 1500);
+	_scene->addItem(_entityItem);
 
 	QHBoxLayout *layout = new QHBoxLayout;
-	view = new QGraphicsView(scene);
-	layout->addWidget(view);
+	_view = new QGraphicsView(_scene);
+	layout->addWidget(_view);
 
 	QWidget *widget = new QWidget;
 	widget->setLayout(layout);
@@ -25,28 +31,28 @@ GUI::~GUI()
 
 void GUI::createActions()
 {
-	openAction = new QAction(QIcon("images/openFile.png"), tr("O&pen..."), this);
-	openAction->setShortcut(tr("Ctrl+O"));
-	connect(openAction, SIGNAL(triggered()), this, SLOT(browse()));
+	_openAction = new QAction(QIcon("images/openFile.png"), tr("O&pen..."), this);
+	_openAction->setShortcut(tr("Ctrl+O"));
+	connect(_openAction, SIGNAL(triggered()), this, SLOT(browse()));
 
-	exitAction = new QAction(QIcon("images/exit.png"), tr("E&xit"), this);
-	exitAction->setShortcut(tr("Alt+F4"));
-	connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+	_exitAction = new QAction(QIcon("images/exit.png"), tr("E&xit"), this);
+	_exitAction->setShortcut(tr("Alt+F4"));
+	connect(_exitAction, SIGNAL(triggered()), this, SLOT(close()));
 }
 
 void GUI::createMenus()
 {
-	fileMenu = menuBar()->addMenu(tr("&File","&Exit"));
-	fileMenu->addAction(openAction);
-	fileMenu->addSeparator();
-	fileMenu->addAction(exitAction);
+	_fileMenu = menuBar()->addMenu(tr("&File","&Exit"));
+	_fileMenu->addAction(_openAction);
+	_fileMenu->addSeparator();
+	_fileMenu->addAction(_exitAction);
 }
 
 void GUI::createToolbars()
 {
-	fileToolBar = addToolBar(tr("File"));
-	fileToolBar->addAction(openAction);
-	fileToolBar->addAction(exitAction);
+	_fileToolBar = addToolBar(tr("File"));
+	_fileToolBar->addAction(_openAction);
+	_fileToolBar->addAction(_exitAction);
 }
 
 void GUI::browse()

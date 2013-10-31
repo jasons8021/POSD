@@ -145,6 +145,9 @@
     <ClCompile Include="ERDiagramMessageBoxManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EntityItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddComponentCmd.h">
@@ -196,6 +199,9 @@
       <Filter>Header Files\Toolkit</Filter>
     </ClInclude>
     <ClInclude Include="ERDiagramMessageBoxManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

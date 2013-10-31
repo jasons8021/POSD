@@ -7,8 +7,8 @@
 #include "PresentationModel.h"
 #include "GUI.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define PARAMETER_WINDOW_WIDTH 800
+#define PARAMETER_WINDOW_HEIGHT 600
 
 using namespace std;
 
@@ -22,9 +22,9 @@ int main(int argc, char *argv[])
 		QApplication app(argc, argv);
 		GUI* graphicalUI = new GUI(presentationModel);
 
-		graphicalUI->setMaximumSize(WINDOW_WIDTH,WINDOW_HEIGHT);
-		graphicalUI->setMinimumSize(WINDOW_WIDTH,WINDOW_HEIGHT);
-		graphicalUI->setWindowTitle("ER Model GUI");
+		graphicalUI->setMaximumSize(PARAMETER_WINDOW_WIDTH, PARAMETER_WINDOW_HEIGHT);
+		graphicalUI->setMinimumSize(PARAMETER_WINDOW_WIDTH, PARAMETER_WINDOW_HEIGHT);
+		graphicalUI->setWindowTitle("Entity Relation Diagramming Tool");
 		graphicalUI->show();
 		return app.exec();
 	}

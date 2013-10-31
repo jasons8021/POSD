@@ -7,9 +7,11 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QWidget>
+#include <QGraphicsItem>
 #include "ERDiagramMessageBoxManager.h"
 #include "ERDiagramScene.h"
 #include "PresentationModel.h"
+#include "EntityItem.h"
 
 QT_BEGIN_NAMESPACE
 class DiagramScene;
@@ -31,16 +33,18 @@ private:
 	void createMenus();
 	void createToolbars();
 
-	QGraphicsView* view;
-	ERDiagramScene* scene;
+	QGraphicsView* _view;
+	ERDiagramScene* _scene;
 
 	//bar
-	QMenu* fileMenu;
-	QToolBar* fileToolBar;
+	QMenu* _fileMenu;
+	QToolBar* _fileToolBar;
 
 	//QAction
-	QAction* exitAction;
-	QAction* openAction;
+	QAction* _exitAction;
+	QAction* _openAction;
+
+	EntityItem* _entityItem;
 
 	PresentationModel* _presentationModel;
 };
